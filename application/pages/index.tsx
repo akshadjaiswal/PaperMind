@@ -1,100 +1,170 @@
+import Head from 'next/head';
+import { useMutation } from '@tanstack/react-query';
+import { AnimatePresence } from 'framer-motion';
+
+import { MainLayout } from '@/components/layout/MainLayout';
+import { TopicInput } from '@/components/search/TopicInput';
+import { PaperList } from '@/components/search/PaperList';
+import { GenerateButton } from '@/components/search/GenerateButton';
+import { ProgressSteps } from '@/components/output/ProgressSteps';
+import { OutputPanel } from '@/components/output/OutputPanel';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { AnimatedSection } from '@/components/ui/AnimatedSection';
+
+import { usePaperMindStore } from '@/lib/store';
+import { searchPapers } from '@/lib/api/search';
+import { generateSynthesis } from '@/lib/api/generate';
+import type { PaperSource } from '@/lib/types';
+
 export default function Home() {
+  const {
+    topic,
+    papers,
+    selectedIds,
+    output,
+    status,
+    errorType,
+    retryAfter,
+    sources,
+    setPapers,
+    setOutput,
+    setStatus,
+    setError,
+  } = usePaperMindStore();
+
+  // Results stored in Zustand, not query cache — no invalidateQueries needed
+  const searchMutation = useMutation({
+    mutationFn: searchPapers,
+    gcTime: 0,
+    onMutate: () => {
+      setStatus('searching');
+    },
+    onSuccess: (data) => {
+      setPapers(data.papers);
+      setStatus('idle');
+    },
+    onError: () => {
+      setError('search_failure');
+    },
+  });
+
+  // Results stored in Zustand, not query cache — no invalidateQueries needed
+  const generateMutation = useMutation({
+    mutationFn: generateSynthesis,
+    gcTime: 0,
+    onMutate: () => {
+      setStatus('generating');
+    },
+    onSuccess: (data) => {
+      if (data.error) {
+        setError(data.error, data.retry_after);
+      } else if (data.output) {
+        setOutput(data.output);
+        setStatus('done');
+      }
+    },
+    onError: () => {
+      setError('network');
+    },
+  });
+
+  const handleSearch = (searchTopic: string, searchSources: PaperSource) => {
+    searchMutation.mutate({ topic: searchTopic, sources: searchSources });
+  };
+
+  const handleGenerate = () => {
+    const selectedPapers = papers.filter((p) => selectedIds.includes(p.id));
+    generateMutation.mutate({ topic, papers: selectedPapers });
+  };
+
+  const handleRetry = () => {
+    if (errorType === 'search_failure') {
+      searchMutation.mutate({ topic, sources });
+    } else {
+      const selectedPapers = papers.filter((p) => selectedIds.includes(p.id));
+      generateMutation.mutate({ topic, papers: selectedPapers });
+    }
+  };
+
+  const isSearching = status === 'searching';
+  const isGenerating = status === 'generating';
+  const isDone = status === 'done';
+  const isError = status === 'error';
+  const hasPapers = papers.length > 0;
+
   return (
-    <main className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-20">
-        {/* Header */}
-        <header className="mb-20 border-b border-black pb-12">
-          <div className="mb-4">
-            <span className="text-xs font-light tracking-widest uppercase text-gray-600">
-              Generated with DevStart CLI
-            </span>
-          </div>
-          <h1 className="text-6xl md:text-8xl font-light tracking-tight text-black mb-6">
-            application
-          </h1>
-          <p className="text-xl font-light text-gray-600 max-w-2xl">
-            Production-ready application scaffolded in 30 seconds
-          </p>
-        </header>
+    <>
+      <Head>
+        <title>PaperMind: AI Research Synthesis</title>
+      </Head>
+      <MainLayout>
+        <div className="max-w-2xl mx-auto px-5 py-8 w-full space-y-6">
+          {/* Header — only show when idle/searching/error */}
+          {!isDone && (
+            <AnimatedSection delay={0}>
+              <div className="mb-2">
+                <h1 className="font-serif text-3xl font-semibold text-app-text leading-tight">
+                  Research Synthesis
+                </h1>
+                <p className="font-sans text-sm text-app-text/45 mt-1">
+                  Search peer-reviewed papers, select the relevant ones, and get an AI-synthesized report.
+                </p>
+              </div>
+            </AnimatedSection>
+          )}
 
-        {/* Tech Stack */}
-        <section className="mb-20">
-          <h2 className="text-xs font-medium tracking-widest uppercase text-black mb-8 border-b border-gray-200 pb-3">
-            Your Stack
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="border border-gray-200 p-6 hover:border-black transition-colors">
-              <div className="text-xs font-light text-gray-500 mb-2">Styling</div>
-              <div className="font-light text-black">Tailwind CSS</div>
-            </div>
-            <div className="border border-gray-200 p-6 hover:border-black transition-colors">
-              <div className="text-xs font-light text-gray-500 mb-2">UI Components</div>
-              <div className="font-light text-black">shadcn/ui</div>
-            </div>
-            <div className="border border-gray-200 p-6 hover:border-black transition-colors">
-              <div className="text-xs font-light text-gray-500 mb-2">State</div>
-              <div className="font-light text-black">Zustand</div>
-            </div>
-            <div className="border border-gray-200 p-6 hover:border-black transition-colors">
-              <div className="text-xs font-light text-gray-500 mb-2">Data Fetching</div>
-              <div className="font-light text-black">TanStack Query</div>
-            </div>
-            
-            
-          </div>
-        </section>
+          {/* Search input — always visible unless done */}
+          {!isDone && !isGenerating && (
+            <AnimatedSection delay={0.05}>
+              <TopicInput onSearch={handleSearch} isLoading={isSearching} />
+            </AnimatedSection>
+          )}
 
-        {/* Quick Start */}
-        <section className="mb-20 border border-black p-8">
-          <h2 className="text-xs font-medium tracking-widest uppercase text-black mb-6">
-            Quick Start
-          </h2>
-          <div className="space-y-4 font-light text-gray-700">
-            <div className="flex items-start gap-3">
-              <span className="text-gray-400 mt-1">01</span>
-              <p>Edit <code className="bg-gray-50 border border-gray-200 px-2 py-1 text-sm font-mono text-black">pages/index.tsx</code> to customize this page</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-gray-400 mt-1">02</span>
-              <p>Configure environment variables in <code className="bg-gray-50 border border-gray-200 px-2 py-1 text-sm font-mono text-black">.env.local.example</code></p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-gray-400 mt-1">03</span>
-              <p>Your integrations are ready to use in the <code className="bg-gray-50 border border-gray-200 px-2 py-1 text-sm font-mono text-black">lib/</code> folder</p>
-            </div>
-          </div>
-        </section>
+          {/* Error message */}
+          <AnimatePresence>
+            {isError && errorType && (
+              <AnimatedSection>
+                <ErrorMessage
+                  errorType={errorType}
+                  retryAfter={retryAfter}
+                  onRetry={errorType !== 'rate_limit' ? handleRetry : undefined}
+                />
+              </AnimatedSection>
+            )}
+          </AnimatePresence>
 
-        {/* Footer / DevStart Promo */}
-        <footer className="border-t border-gray-200 pt-12">
-          <div className="mb-8">
-            <p className="text-sm font-light text-gray-600 mb-6">
-              This project was scaffolded in 30 seconds, saving you 2-4 hours of manual configuration.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="https://github.com/akshadjaiswal/devstart"
-                className="inline-block border border-black px-6 py-3 text-sm font-light hover:bg-black hover:text-white transition-colors text-center"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ★ Star on GitHub
-              </a>
-              <a
-                href="https://www.npmjs.com/package/devstart-cli"
-                className="inline-block border border-gray-300 px-6 py-3 text-sm font-light hover:border-black transition-colors text-center"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View on npm
-              </a>
-            </div>
-          </div>
-          <div className="text-xs font-light text-gray-500">
-            <code className="bg-gray-50 border border-gray-200 px-2 py-1 font-mono">npx devstart-cli init</code>
-          </div>
-        </footer>
-      </div>
-    </main>
-  )
+          {/* Main content area — mutually exclusive states */}
+          <AnimatePresence mode="wait">
+            {/* Generating: progress steps */}
+            {isGenerating && (
+              <AnimatedSection key="progress" delay={0.1}>
+                <ProgressSteps topic={topic} paperCount={selectedIds.length} />
+              </AnimatedSection>
+            )}
+
+            {/* Done: output panel */}
+            {isDone && output && (
+              <AnimatedSection key="output" delay={0}>
+                <OutputPanel output={output} />
+              </AnimatedSection>
+            )}
+
+            {/* Papers list (idle/error state with papers) */}
+            {!isGenerating && !isDone && (hasPapers || isSearching) && (
+              <AnimatedSection key="papers" delay={0.1}>
+                <PaperList warnings={searchMutation.data?.warnings} />
+              </AnimatedSection>
+            )}
+          </AnimatePresence>
+
+          {/* Generate button — shown when papers loaded and not generating/done */}
+          {hasPapers && !isGenerating && !isDone && (
+            <AnimatedSection delay={0.15}>
+              <GenerateButton onClick={handleGenerate} />
+            </AnimatedSection>
+          )}
+        </div>
+      </MainLayout>
+    </>
+  );
 }
