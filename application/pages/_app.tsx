@@ -3,6 +3,7 @@ import { Playfair_Display, Source_Sans_3 } from 'next/font/google';
 import '../styles/globals.css';
 import { QueryProvider } from '@/lib/query-provider';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { ThemeProvider } from '@/lib/theme';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -23,9 +24,11 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
       <QueryProvider>
-        <div className={`${playfair.variable} ${sourceSans.variable}`}>
-          <Component {...pageProps} />
-        </div>
+        <ThemeProvider>
+          <div className={`${playfair.variable} ${sourceSans.variable}`}>
+            <Component {...pageProps} />
+          </div>
+        </ThemeProvider>
       </QueryProvider>
     </ErrorBoundary>
   );

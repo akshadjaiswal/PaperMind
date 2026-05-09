@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -8,20 +9,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: '#F9F8F4',
-        'app-text': '#2D3A31',
+        bg: 'var(--bg)',
+        'app-text': 'var(--text)',
         primary: {
-          DEFAULT: '#8C9A84',
-          hover: '#7A8872',
+          DEFAULT: 'var(--primary-color)',
+          hover: 'var(--primary-hover)',
         },
-        secondary: '#DCCFC2',
-        border: '#E6E2DA',
+        secondary: 'var(--secondary-color)',
+        border: 'var(--border-color)',
         interactive: {
-          DEFAULT: '#C27B66',
-          hover: '#B06855',
+          DEFAULT: 'var(--interactive-color)',
+          hover: 'var(--interactive-hover)',
         },
-        surface: '#FFFFFF',
-        'surface-raised': '#F4F2EE',
+        surface: 'var(--surface)',
+        'surface-raised': 'var(--surface-raised)',
       },
       fontFamily: {
         serif: ['var(--font-playfair)', '"Playfair Display"', 'Georgia', 'serif'],

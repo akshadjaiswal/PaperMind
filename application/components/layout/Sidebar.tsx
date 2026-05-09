@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Trash2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePaperMindStore } from '@/lib/store';
+import { ThemeToggle } from './ThemeToggle';
 
 const NavLink = ({ href, label }: { href: string; label: string }) => {
   const { pathname } = useRouter();
@@ -104,13 +105,16 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-border">
-        <p className="text-[11px] text-app-text/30 font-sans leading-relaxed">
-          Powered by Groq &amp; Llama 3.3
-        </p>
-        <p className="text-[11px] text-app-text/25 font-sans mt-0.5">
-          PubMed · Semantic Scholar
-        </p>
+      <div className="px-5 py-4 border-t border-border space-y-3">
+        <ThemeToggle />
+        <div>
+          <p className="text-[11px] text-app-text/30 font-sans leading-relaxed">
+            Powered by Groq &amp; Llama 3.3
+          </p>
+          <p className="text-[11px] text-app-text/25 font-sans mt-0.5">
+            PubMed · Semantic Scholar
+          </p>
+        </div>
       </div>
     </aside>
   );

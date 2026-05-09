@@ -73,26 +73,44 @@ export function MermaidChart({ chart }: MermaidChartProps) {
     const render = async () => {
       try {
         const mermaid = (await import('mermaid')).default;
+        const isDark = document.documentElement.classList.contains('dark');
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
           securityLevel: 'loose',
-          themeVariables: {
-            primaryColor: '#DDE5D9',
-            primaryTextColor: '#2D3A31',
-            primaryBorderColor: '#8C9A84',
-            lineColor: '#DCCFC2',
-            secondaryColor: '#F4F2EE',
-            tertiaryColor: '#F9F8F4',
-            background: '#FFFFFF',
-            mainBkg: '#DDE5D9',
-            nodeBorder: '#8C9A84',
-            clusterBkg: '#F4F2EE',
-            titleColor: '#2D3A31',
-            edgeLabelBackground: '#F9F8F4',
-            fontFamily: 'Source Sans 3, system-ui, sans-serif',
-            fontSize: '14px',
-          },
+          themeVariables: isDark
+            ? {
+                primaryColor: '#2a3327',
+                primaryTextColor: '#e2e8df',
+                primaryBorderColor: '#8c9a84',
+                lineColor: '#3a4a3e',
+                secondaryColor: '#282e26',
+                tertiaryColor: '#212620',
+                background: '#1a1f1c',
+                mainBkg: '#2a3327',
+                nodeBorder: '#8c9a84',
+                clusterBkg: '#282e26',
+                titleColor: '#e2e8df',
+                edgeLabelBackground: '#212620',
+                fontFamily: 'Source Sans 3, system-ui, sans-serif',
+                fontSize: '14px',
+              }
+            : {
+                primaryColor: '#DDE5D9',
+                primaryTextColor: '#2D3A31',
+                primaryBorderColor: '#8C9A84',
+                lineColor: '#DCCFC2',
+                secondaryColor: '#F4F2EE',
+                tertiaryColor: '#F9F8F4',
+                background: '#FFFFFF',
+                mainBkg: '#DDE5D9',
+                nodeBorder: '#8C9A84',
+                clusterBkg: '#F4F2EE',
+                titleColor: '#2D3A31',
+                edgeLabelBackground: '#F9F8F4',
+                fontFamily: 'Source Sans 3, system-ui, sans-serif',
+                fontSize: '14px',
+              },
         });
 
         const cleanChart = sanitizeMermaid(chart);

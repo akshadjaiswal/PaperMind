@@ -28,7 +28,7 @@ export function OutputPanel({ output }: OutputPanelProps) {
         </button>
         <div className="flex items-center gap-2">
           <CopyButton output={output} />
-          <ExportButton outputId="output-panel" />
+          <ExportButton output={output} />
         </div>
       </div>
 
@@ -38,25 +38,25 @@ export function OutputPanel({ output }: OutputPanelProps) {
           <TabsList className="rounded-pill bg-surface-raised border border-border h-auto p-1 gap-0.5 mb-6">
             <TabsTrigger
               value="report"
-              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
+              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-interactive data-[state=active]:text-white data-[state=active]:font-semibold data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
             >
               Report
             </TabsTrigger>
             <TabsTrigger
               value="flowchart"
-              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
+              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-interactive data-[state=active]:text-white data-[state=active]:font-semibold data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
             >
               Flowchart
             </TabsTrigger>
             <TabsTrigger
               value="table"
-              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
+              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-interactive data-[state=active]:text-white data-[state=active]:font-semibold data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
             >
               Table
             </TabsTrigger>
             <TabsTrigger
               value="references"
-              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
+              className="rounded-pill text-xs font-sans px-4 py-1.5 data-[state=active]:bg-interactive data-[state=active]:text-white data-[state=active]:font-semibold data-[state=active]:shadow-soft-sm text-app-text/55 transition-all duration-200"
             >
               References
             </TabsTrigger>

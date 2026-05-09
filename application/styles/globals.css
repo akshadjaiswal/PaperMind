@@ -37,16 +37,50 @@
   --radius: 1.5rem;
 }
 
+.dark {
+  --bg: #1a1f1c;
+  --text: #e2e8df;
+  --primary-color: #8c9a84;
+  --primary-hover: #9dab95;
+  --secondary-color: #2e2a26;
+  --border-color: #2c332a;
+  --interactive-color: #c27b66;
+  --interactive-hover: #d08b76;
+  --surface: #212620;
+  --surface-raised: #282e26;
+
+  /* shadcn/ui HSL vars — dark */
+  --background: 150 9% 11%;
+  --foreground: 140 10% 89%;
+  --card: 150 9% 13%;
+  --card-foreground: 140 10% 89%;
+  --popover: 150 9% 13%;
+  --popover-foreground: 140 10% 89%;
+  --primary: 126 8% 57%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 30 9% 17%;
+  --secondary-foreground: 140 10% 89%;
+  --muted: 150 6% 18%;
+  --muted-foreground: 140 6% 60%;
+  --accent: 150 6% 18%;
+  --accent-foreground: 140 10% 89%;
+  --destructive: 14 30% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 150 8% 20%;
+  --input: 150 8% 20%;
+  --ring: 126 8% 57%;
+}
+
 @layer base {
   html {
-    background-color: #f9f8f4;
-    color: #2d3a31;
+    background-color: var(--bg);
+    color: var(--text);
   }
 
   body {
     font-family: var(--font-source-sans), system-ui, sans-serif;
-    background-color: #f9f8f4;
-    color: #2d3a31;
+    background-color: var(--bg);
+    color: var(--text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -61,7 +95,7 @@
   }
 
   * {
-    border-color: #e6e2da;
+    border-color: var(--border-color);
   }
 }
 
