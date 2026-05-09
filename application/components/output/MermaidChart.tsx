@@ -5,10 +5,40 @@ interface MermaidChartProps {
   chart: string;
 }
 
+/**
+ * Sanitizes LLM-generated Mermaid to fix common syntax mistakes.
+ * LLMs frequently output invalid arrow/label combinations.
+ */
+function sanitizeMermaid(raw: string): string {
+  return (
+    raw
+      // Strip markdown code fences
+      .replace(/^```(?:mermaid)?\s*/im, '')
+      .replace(/\s*```\s*$/m, '')
+      .trim()
+      // Fix -->|label|> — stray > after closing label pipe
+      .replace(/(\|[^|]*\|)>/g, '$1')
+      // Fix ==>|label|> and -.->|label|> variants
+      .replace(/(==\|[^|]*\|)>/g, '$1')
+      .replace(/(-\.-\|[^|]*\|)>/g, '$1')
+      // Fix double-arrow heads like -->> or ==>> (invalid in flowchart LR/TD)
+      .replace(/-->>/g, '-->')
+      .replace(/==>>/g, '==>')
+      // Fix |>label| — pipe arrow label that starts with >
+      .replace(/\|>(.*?)\|/g, '|$1|')
+      // Fix unclosed brackets: [label without closing]
+      // Only fixable per-line safely — skip, mermaid gives decent error for these
+      // Normalize smart quotes that LLMs sometimes emit
+      .replace(/[""]/g, '"')
+      .replace(/['']/g, "'")
+  );
+}
+
 export function MermaidChart({ chart }: MermaidChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
+  const [rawChart, setRawChart] = useState('');
 
   useEffect(() => {
     if (!containerRef.current || !chart) return;
@@ -20,6 +50,7 @@ export function MermaidChart({ chart }: MermaidChartProps) {
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
+          securityLevel: 'loose',
           themeVariables: {
             primaryColor: '#DDE5D9',
             primaryTextColor: '#2D3A31',
@@ -38,12 +69,14 @@ export function MermaidChart({ chart }: MermaidChartProps) {
           },
         });
 
+        const cleanChart = sanitizeMermaid(chart);
+        setRawChart(cleanChart);
+
         const id = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const { svg } = await mermaid.render(id, chart.trim());
+        const { svg } = await mermaid.render(id, cleanChart);
 
         if (!cancelled && containerRef.current) {
           containerRef.current.innerHTML = svg;
-          // Make SVG responsive
           const svgEl = containerRef.current.querySelector('svg');
           if (svgEl) {
             svgEl.removeAttribute('width');
@@ -55,8 +88,9 @@ export function MermaidChart({ chart }: MermaidChartProps) {
         }
       } catch (e) {
         if (!cancelled) {
-          console.error('[MermaidChart] Render error:', e);
-          setError('Could not render the flowchart diagram.');
+          // Log for debugging but don't surface raw parse error to user
+          console.warn('[MermaidChart] Render failed after sanitization:', e);
+          setError('fallback');
         }
       }
     };
@@ -67,12 +101,15 @@ export function MermaidChart({ chart }: MermaidChartProps) {
     };
   }, [chart]);
 
-  if (error) {
+  // Graceful fallback: show formatted source instead of crash
+  if (error === 'fallback') {
     return (
-      <div className="bg-surface-raised rounded-card p-6 text-center">
-        <p className="text-sm text-app-text/50 font-sans">{error}</p>
-        <pre className="text-xs mt-3 text-app-text/35 font-mono overflow-x-auto whitespace-pre-wrap">
-          {chart}
+      <div className="bg-surface-raised rounded-card border border-border p-5">
+        <p className="text-xs text-app-text/45 font-sans mb-3">
+          Diagram could not render — showing source instead.
+        </p>
+        <pre className="text-xs text-app-text/60 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap bg-surface rounded-xl p-4 border border-border/50">
+          {rawChart || sanitizeMermaid(chart)}
         </pre>
       </div>
     );

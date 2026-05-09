@@ -21,7 +21,7 @@ OUTPUT FORMAT (JSON):
   "main_findings": "800-1200 words synthesizing findings from papers",
   "discussion": "600-800 words comparing, contrasting, analyzing",
   "conclusion": "300-400 word conclusion with future directions",
-  "flowchart_mermaid": "Valid Mermaid.js flowchart code for the main process/concepts",
+  "flowchart_mermaid": "Valid Mermaid.js flowchart LR code. IMPORTANT: use only --> for arrows and -->|label| for labeled arrows. Never use -->|label|> or -->> or any other arrow variant. Example: A[Start] --> B[Step] -->|condition| C[End]",
   "comparison_table": "Valid Markdown table comparing key aspects across papers",
   "references": [
     {
