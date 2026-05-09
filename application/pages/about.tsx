@@ -21,7 +21,7 @@ const apis = [
 ];
 
 const features = [
-  'Real peer-reviewed papers — not hallucinated citations',
+  'Real peer-reviewed papers, not hallucinated citations',
   'Structured 3,000–4,500 word synthesis',
   'Visual flowchart of the research process',
   'Side-by-side comparison table across papers',
@@ -33,7 +33,7 @@ export default function About() {
   return (
     <>
       <Head>
-        <title>About — PaperMind</title>
+        <title>About | PaperMind</title>
       </Head>
       <MainLayout>
         <div className="max-w-2xl mx-auto px-6 py-12">
@@ -44,7 +44,7 @@ export default function About() {
             </h1>
             <p className="font-sans text-app-text/70 text-base leading-relaxed">
               PaperMind turns any research topic into a structured academic synthesis. Type a topic,
-              select real peer-reviewed papers, and get a comprehensive report — synthesized by AI
+              select real peer-reviewed papers, and get a comprehensive report synthesized by AI
               from actual abstracts, not invented from scratch.
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function About() {
                 'The AI generates a structured report from the actual abstracts',
                 'Export your synthesis as a PDF or copy as Markdown',
               ].map((step, i) => (
-                <div key={i} className="flex items-start gap-4">
+                <div key={step} className="flex items-start gap-4">
                   <span className="font-serif text-primary font-semibold text-base w-6 shrink-0 pt-0.5">
                     {i + 1}
                   </span>
@@ -76,8 +76,8 @@ export default function About() {
               What you get
             </h2>
             <div className="bg-surface rounded-card border border-border p-5 space-y-2.5">
-              {features.map((f, i) => (
-                <div key={i} className="flex items-start gap-3">
+              {features.map((f) => (
+                <div key={f} className="flex items-start gap-3">
                   <svg
                     width="14"
                     height="14"

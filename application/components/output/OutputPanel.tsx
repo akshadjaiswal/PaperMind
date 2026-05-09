@@ -17,9 +17,9 @@ export function OutputPanel({ output }: OutputPanelProps) {
   const { reset, topic } = usePaperMindStore();
 
   return (
-    <div className="w-full">
+    <div className="w-full" id="print-output">
       {/* Action bar */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
+      <div className="no-print flex items-center justify-between mb-4 pb-4 border-b border-border">
         <button
           onClick={reset}
           className="rounded-pill px-4 py-1.5 text-xs font-medium font-sans border border-border text-app-text/55 hover:text-app-text hover:bg-surface-raised bg-surface transition-all duration-200"

@@ -42,7 +42,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 py-6 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+          <div className="size-8 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
             <LeafIcon />
           </div>
           <span className="font-serif text-lg font-semibold text-app-text tracking-tight">
@@ -63,7 +63,7 @@ export function Sidebar() {
       {/* History */}
       <div className="flex-1 overflow-y-auto">
         {history.length > 0 ? (
-          <div className="px-3 py-3">
+          <div className="p-3">
             <div className="flex items-center gap-2 px-1 mb-2">
               <Clock size={11} className="text-app-text/30" />
               <span className="text-[11px] font-sans font-medium text-app-text/35 uppercase tracking-wider">
@@ -105,7 +105,7 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-border">
+      <div className="p-4 border-t border-border">
         {/* Appearance row */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-[11px] text-app-text/35 font-sans font-medium uppercase tracking-wider">

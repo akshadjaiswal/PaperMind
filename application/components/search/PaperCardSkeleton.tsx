@@ -2,7 +2,7 @@ export function PaperCardSkeleton() {
   return (
     <div className="bg-surface rounded-card border border-border p-5 flex gap-4">
       {/* Checkbox area */}
-      <div className="w-5 h-5 rounded bg-surface-raised animate-pulse shrink-0 mt-0.5" />
+      <div className="size-5 rounded bg-surface-raised animate-pulse shrink-0 mt-0.5" />
       <div className="flex-1 space-y-3">
         {/* Title */}
         <div className="space-y-1.5">

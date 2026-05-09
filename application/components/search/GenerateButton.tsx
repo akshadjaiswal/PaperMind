@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 import { usePaperMindStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,7 @@ export function GenerateButton({ onClick }: GenerateButtonProps) {
   return (
     <AnimatePresence>
       {!isDone && (hasAny || isGenerating) && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
@@ -26,7 +26,7 @@ export function GenerateButton({ onClick }: GenerateButtonProps) {
           className="fixed bottom-6 left-0 right-0 z-30 flex justify-center pointer-events-none px-5 md:pl-[calc(256px+1.25rem)]"
         >
           <div className="pointer-events-auto w-full max-w-sm">
-            <motion.button
+            <m.button
               onClick={canGenerate && !isGenerating ? onClick : undefined}
               disabled={!canGenerate || isGenerating}
               whileHover={canGenerate && !isGenerating ? { scale: 1.02 } : {}}
@@ -57,9 +57,9 @@ export function GenerateButton({ onClick }: GenerateButtonProps) {
                     : `Select ${3 - count} more to synthesize`}
                 </>
               )}
-            </motion.button>
+            </m.button>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

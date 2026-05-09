@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { Reference } from '@/lib/types';
 
 interface ReferencesTabProps {
@@ -15,7 +15,7 @@ export function ReferencesTab({ refs }: ReferencesTabProps) {
   return (
     <ol className="list-none space-y-4">
       {refs.map((ref, i) => (
-        <motion.li
+        <m.li
           key={ref.number}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -27,7 +27,7 @@ export function ReferencesTab({ refs }: ReferencesTabProps) {
           </span>
           <div className="text-sm font-sans text-app-text/75 leading-relaxed min-w-0">
             <span className="font-medium text-app-text">{ref.title}</span>
-            <span className="text-app-text/50"> — {ref.authors}</span>
+            <span className="text-app-text/50"> · {ref.authors}</span>
             {ref.year && (
               <span className="text-app-text/45"> ({ref.year})</span>
             )}
@@ -45,7 +45,7 @@ export function ReferencesTab({ refs }: ReferencesTabProps) {
               </a>
             )}
           </div>
-        </motion.li>
+        </m.li>
       ))}
     </ol>
   );

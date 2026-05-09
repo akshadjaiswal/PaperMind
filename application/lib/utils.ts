@@ -11,13 +11,6 @@ export function truncateAbstract(text: string, maxLength = 280): string {
   return text.slice(0, maxLength).trimEnd() + '…';
 }
 
-export function formatAuthors(authors: string[] | string): string {
-  if (typeof authors === 'string') return authors;
-  if (authors.length === 0) return 'Unknown authors';
-  if (authors.length <= 3) return authors.join(', ');
-  return authors.slice(0, 3).join(', ') + ' et al.';
-}
-
 export function normalizeTitle(title: string): string {
   return title
     .toLowerCase()

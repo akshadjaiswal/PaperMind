@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useMutation } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 import { MainLayout } from '@/components/layout/MainLayout';
 import { TopicInput } from '@/components/search/TopicInput';
@@ -100,7 +100,7 @@ export default function Home() {
           <div className="relative flex flex-col min-h-full">
             {/* Centered hero */}
             <div className="flex-1 flex flex-col items-center justify-center px-5 pb-40">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -112,7 +112,7 @@ export default function Home() {
                 <p className="font-sans text-base text-app-text/40 leading-relaxed">
                   Search peer-reviewed papers, select the relevant ones,<br className="hidden sm:block" /> and get an AI-synthesized report.
                 </p>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Gradient fade + sticky input at bottom */}

@@ -36,14 +36,15 @@ OUTPUT FORMAT (JSON):
 }`;
 
 export function buildUserMessage(topic: string, papers: Paper[]): string {
+  let idx = 0;
   const paperBlocks = papers
-    .filter((p) => p.abstract !== 'No abstract available.')
-    .map(
-      (p, i) =>
-        `[${i + 1}] Title: ${p.title}
+    .flatMap((p) => {
+      if (p.abstract === 'No abstract available.') return [];
+      const i = idx++;
+      return [`[${i + 1}] Title: ${p.title}
     Authors: ${p.authors} | Year: ${p.year ?? 'Unknown'} | Journal: ${p.journal ?? 'Unknown'}
-    Abstract: ${p.abstract.slice(0, 1500)}${p.abstract.length > 1500 ? '…' : ''}`
-    )
+    Abstract: ${p.abstract.slice(0, 1500)}${p.abstract.length > 1500 ? '…' : ''}`];
+    })
     .join('\n\n');
 
   return `Topic: ${topic}\n\nPapers:\n${paperBlocks}`;

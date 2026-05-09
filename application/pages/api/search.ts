@@ -104,12 +104,13 @@ function parsePubMedXml(xml: string): Paper[] {
       // Authors
       const authorList = articleData?.AuthorList as Record<string, unknown> | undefined;
       const rawAuthors = authorList?.Author as unknown[] | undefined;
-      const authors = [].concat(rawAuthors as never[] ?? []).map((auth) => {
+      const authors = [].concat(rawAuthors as never[] ?? []).flatMap((auth) => {
         const a2 = auth as Record<string, unknown>;
         const last = String(a2?.LastName ?? '');
         const initials = String(a2?.Initials ?? '');
-        return last ? `${last} ${initials}`.trim() : String(a2?.CollectiveName ?? '');
-      }).filter(Boolean);
+        const name = last ? `${last} ${initials}`.trim() : String(a2?.CollectiveName ?? '');
+        return name ? [name] : [];
+      });
 
       // Abstract
       const rawAbstract = (articleData?.Abstract as Record<string, unknown>)?.AbstractText;
@@ -201,7 +202,7 @@ async function fetchSemantic(topic: string): Promise<Paper[]> {
       if (!title) return [];
 
       const rawAuthors = (p?.authors as Array<Record<string, unknown>>) ?? [];
-      const authors = rawAuthors.map((a) => String(a?.name ?? '')).filter(Boolean).join(', ');
+      const authors = rawAuthors.flatMap((a) => { const n = String(a?.name ?? ''); return n ? [n] : []; }).join(', ');
 
       const externalIds = p?.externalIds as Record<string, unknown> | undefined;
       const doi = String(externalIds?.DOI ?? '').trim() || null;
@@ -258,7 +259,7 @@ function deduplicatePapers(papers: Paper[]): Paper[] {
   }
 
   return [...seen.values()]
-    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+    .toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0))
     .slice(0, 15);
 }
 

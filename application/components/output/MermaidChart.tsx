@@ -38,6 +38,15 @@ function sanitizeMermaid(raw: string): string {
   // Force LR → TD so wide chains don't render as a squished horizontal strip
   s = s.replace(/^(graph|flowchart)\s+LR\b/im, (match) => match.replace(/LR/i, 'TD'));
 
+  // Escape parentheses inside node labels — Mermaid v11 treats ( as stadium shape start
+  // even when nested inside [...] or {...}, causing parse errors on labels like "Name (Acronym)"
+  s = s.replace(/\[([^\]\n]*)\]/g, (_, inner) =>
+    '[' + inner.replace(/\(/g, '（').replace(/\)/g, '）') + ']'
+  );
+  s = s.replace(/\{([^}\n]*)\}/g, (_, inner) =>
+    '{' + inner.replace(/\(/g, '（').replace(/\)/g, '）') + '}'
+  );
+
   return s
     // Fix -->|label|> — stray > after closing label pipe
     .replace(/(\|[^|\n]*\|)>/g, '$1')
@@ -137,28 +146,27 @@ export function MermaidChart({ chart }: MermaidChartProps) {
 
             svgEl.removeAttribute('width');
             svgEl.removeAttribute('height');
-            svgEl.style.width = '100%';
-            svgEl.style.display = 'block';
 
+            let heightStyle = '';
             if (vb) {
-              // viewBox="minX minY width height" — use to set preserveAspectRatio and min-height
               const parts = vb.split(/[\s,]+/);
               const vbW = parseFloat(parts[2]);
               const vbH = parseFloat(parts[3]);
               if (vbW > 0 && vbH > 0) {
                 svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-                // Let CSS aspect-ratio handle height; floor at 240px for tiny charts
                 const containerW = containerRef.current.clientWidth || 600;
-                const renderedH = Math.max(240, Math.round((vbH / vbW) * containerW));
-                svgEl.style.height = `${renderedH}px`;
+                heightStyle = `${Math.max(240, Math.round((vbH / vbW) * containerW))}px`;
               }
             } else if (naturalW > 0 && naturalH > 0) {
               const containerW = containerRef.current.clientWidth || 600;
-              const renderedH = Math.max(240, Math.round((naturalH / naturalW) * containerW));
-              svgEl.style.height = `${renderedH}px`;
-            } else {
-              svgEl.style.minHeight = '240px';
+              heightStyle = `${Math.max(240, Math.round((naturalH / naturalW) * containerW))}px`;
             }
+
+            Object.assign(svgEl.style, {
+              width: '100%',
+              display: 'block',
+              ...(heightStyle ? { height: heightStyle } : { minHeight: '240px' }),
+            });
           }
           setRendered(true);
         }
@@ -182,7 +190,7 @@ export function MermaidChart({ chart }: MermaidChartProps) {
     return (
       <div className="bg-surface-raised rounded-card border border-border p-5">
         <p className="text-xs text-app-text/45 font-sans mb-3">
-          Diagram could not render — showing source instead.
+          Diagram could not render. Showing source instead.
         </p>
         <pre className="text-xs text-app-text/60 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap bg-surface rounded-xl p-4 border border-border/50">
           {rawChart || sanitizeMermaid(chart)}

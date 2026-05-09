@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -14,11 +14,14 @@ interface PaperCardProps {
 
 export function PaperCard({ paper, isSelected, onToggle, index }: PaperCardProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index, 8) * 0.05, ease: 'easeOut' }}
       onClick={onToggle}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
       className={cn(
         'bg-surface rounded-card border transition-all duration-300 p-5 flex gap-4 cursor-pointer',
         isSelected
@@ -27,7 +30,7 @@ export function PaperCard({ paper, isSelected, onToggle, index }: PaperCardProps
       )}
     >
       {/* Checkbox */}
-      <div className="shrink-0 pt-0.5" onClick={(e) => e.stopPropagation()}>
+      <div className="shrink-0 pt-0.5" role="presentation" onClick={(e) => e.stopPropagation()}>
         <Checkbox
           checked={isSelected}
           onCheckedChange={onToggle}
@@ -82,6 +85,6 @@ export function PaperCard({ paper, isSelected, onToggle, index }: PaperCardProps
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

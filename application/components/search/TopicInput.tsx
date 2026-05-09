@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Search, Loader2, SlidersHorizontal, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { SourceToggle } from './SourceToggle';
 import { usePaperMindStore } from '@/lib/store';
@@ -66,7 +66,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
 
   return (
     <div className="w-full">
-      <motion.div
+      <m.div
         animate={
           isLoading
             ? {
@@ -110,17 +110,17 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
             {/* Clear button — visible when there's text */}
             <AnimatePresence>
               {currentValue && !isLoading && (
-                <motion.button
+                <m.button
                   type="button"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.15 }}
                   onClick={() => setValue('topic', '')}
-                  className="shrink-0 w-5 h-5 rounded-full bg-app-text/10 flex items-center justify-center text-app-text/40 hover:text-app-text/70 hover:bg-app-text/15 transition-colors"
+                  className="shrink-0 size-5 rounded-full bg-app-text/10 flex items-center justify-center text-app-text/40 hover:text-app-text/70 hover:bg-app-text/15 transition-colors"
                 >
                   <X size={11} />
-                </motion.button>
+                </m.button>
               )}
             </AnimatePresence>
 
@@ -168,7 +168,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
               {/* Dropdown */}
               <AnimatePresence>
                 {sourcesOpen && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: -6, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -6, scale: 0.97 }}
@@ -179,7 +179,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
                       Paper sources
                     </p>
                     <SourceToggle value={sources} onChange={(v) => { setSources(v); setSourcesOpen(false); }} />
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -190,7 +190,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
             </span>
           </div>
         </form>
-      </motion.div>
+      </m.div>
 
       {errors.topic && (
         <p className="text-xs text-interactive mt-2 px-1 font-sans">{errors.topic.message}</p>

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Circle } from 'lucide-react';
 
 const STEPS = [
-  { label: 'Building your research brief', duration: 2500 },
-  { label: 'Sending to AI model', duration: 7000 },
-  { label: 'Synthesizing key findings', duration: 15000 },
-  { label: 'Preparing your report', duration: 5000 },
+  { id: 'brief', label: 'Building your research brief', duration: 2500 },
+  { id: 'send', label: 'Sending to AI model', duration: 7000 },
+  { id: 'synth', label: 'Synthesizing key findings', duration: 15000 },
+  { id: 'prep', label: 'Preparing your report', duration: 5000 },
 ];
 
 interface ProgressStepsProps {
@@ -50,22 +50,16 @@ export function ProgressSteps({ topic, paperCount }: ProgressStepsProps) {
             const isPending = i > currentStep;
 
             return (
-              <AnimatePresence key={i}>
-                <motion.div
+              <AnimatePresence key={step.id}>
+                <m.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: i * 0.08 }}
                   className="flex items-center gap-3"
                 >
-                  {isDone && (
-                    <CheckCircle2 size={18} className="text-primary shrink-0" />
-                  )}
-                  {isActive && (
-                    <Loader2 size={18} className="text-interactive animate-spin shrink-0" />
-                  )}
-                  {isPending && (
-                    <Circle size={18} className="text-app-text/20 shrink-0" />
-                  )}
+                  {isDone && <CheckCircle2 size={18} className="text-primary shrink-0" />}
+                  {isActive && <Loader2 size={18} className="text-interactive animate-spin shrink-0" />}
+                  {isPending && <Circle size={18} className="text-app-text/20 shrink-0" />}
                   <span
                     className={`font-sans text-sm transition-colors duration-300 ${
                       isDone
@@ -77,7 +71,7 @@ export function ProgressSteps({ topic, paperCount }: ProgressStepsProps) {
                   >
                     {step.label}
                   </span>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             );
           })}
@@ -85,10 +79,10 @@ export function ProgressSteps({ topic, paperCount }: ProgressStepsProps) {
 
         {/* Dots animation */}
         <div className="flex gap-1.5 mt-8 justify-center">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-1.5 h-1.5 rounded-full bg-primary/50"
+          {(['dot-0', 'dot-1', 'dot-2'] as const).map((id, i) => (
+            <m.div
+              key={id}
+              className="size-1.5 rounded-full bg-primary/50"
               animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.22 }}
             />
