@@ -21,7 +21,7 @@ OUTPUT FORMAT (JSON):
   "main_findings": "800-1200 words synthesizing findings from papers",
   "discussion": "600-800 words comparing, contrasting, analyzing",
   "conclusion": "300-400 word conclusion with future directions",
-  "flowchart_mermaid": "Valid Mermaid.js flowchart code. RULES: (1) Start with 'graph LR' or 'flowchart LR' on its own line. (2) Each node connection on a NEW LINE. (3) Use only --> for plain arrows and -->|label| for labeled arrows. NEVER use -->|label|> or -->> or any other variant. EXAMPLE:\ngraph LR\n  A[Topic] --> B[Step 1]\n  B -->|result| C[Step 2]\n  C --> D[Conclusion]",
+  "flowchart_mermaid": "Valid Mermaid.js flowchart code. RULES: (1) Start with 'graph TD' (top-down) on its own line — NEVER graph LR. (2) Each node connection on a NEW LINE. (3) Use only --> for plain arrows and -->|label| for labeled arrows. NEVER use -->|label|> or -->> or any other variant. (4) Aim for 6-10 nodes so the chart is readable. EXAMPLE:\ngraph TD\n  A[Research Topic] --> B[Key Concept 1]\n  A --> C[Key Concept 2]\n  B -->|leads to| D[Finding 1]\n  C -->|leads to| E[Finding 2]\n  D --> F[Conclusion]\n  E --> F",
   "comparison_table": "Valid Markdown table comparing key aspects across papers",
   "references": [
     {

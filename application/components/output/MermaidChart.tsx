@@ -30,10 +30,13 @@ function sanitizeMermaid(raw: string): string {
       .replace(/\s+([\w"']+[\[({>])/g, '\n$1');
   }
 
-  // If no diagram type declaration, prepend graph LR
+  // If no diagram type declaration, prepend graph TD (top-down reads better than LR)
   if (!/^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|mindmap|timeline)/i.test(s.trimStart())) {
-    s = 'graph LR\n' + s;
+    s = 'graph TD\n' + s;
   }
+
+  // Force LR → TD so wide chains don't render as a squished horizontal strip
+  s = s.replace(/^(graph|flowchart)\s+LR\b/im, (match) => match.replace(/LR/i, 'TD'));
 
   return s
     // Fix -->|label|> — stray > after closing label pipe
@@ -43,9 +46,18 @@ function sanitizeMermaid(raw: string): string {
     .replace(/==>>/g, '==>')
     // Fix |>label| — pipe that starts with >
     .replace(/\|>(.*?)\|/g, '|$1|')
+    // Fix --label--> (dashes around label, no pipes) → -->|label|
+    .replace(/--([^->\n]+)-->/g, '-->|$1|')
+    // Remove semicolons at end of lines (valid in some versions, causes parse errors in others)
+    .replace(/;$/gm, '')
+    // Strip any lines that are just whitespace
+    .replace(/^\s*$/gm, '')
+    // Collapse multiple blank lines
+    .replace(/\n{3,}/g, '\n\n')
     // Normalize smart quotes
     .replace(/[""]/g, '"')
-    .replace(/['']/g, "'");
+    .replace(/['']/g, "'")
+    .trim();
 }
 
 export function MermaidChart({ chart }: MermaidChartProps) {
@@ -89,21 +101,53 @@ export function MermaidChart({ chart }: MermaidChartProps) {
         const id = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const { svg } = await mermaid.render(id, cleanChart);
 
+        // Mermaid v11 returns error SVGs instead of throwing — detect and fall back
+        if (svg.includes('Syntax error') || svg.includes('mermaid-error')) {
+          console.warn('[MermaidChart] Mermaid returned error SVG. Clean chart:\n', cleanChart);
+          if (!cancelled) setError('fallback');
+          return;
+        }
+
         if (!cancelled && containerRef.current) {
           containerRef.current.innerHTML = svg;
           const svgEl = containerRef.current.querySelector('svg');
           if (svgEl) {
+            // Read natural dimensions from viewBox before stripping width/height attributes
+            const vb = svgEl.getAttribute('viewBox');
+            const naturalW = parseFloat(svgEl.getAttribute('width') || '0');
+            const naturalH = parseFloat(svgEl.getAttribute('height') || '0');
+
             svgEl.removeAttribute('width');
             svgEl.removeAttribute('height');
-            svgEl.style.maxWidth = '100%';
-            svgEl.style.height = 'auto';
+            svgEl.style.width = '100%';
+            svgEl.style.display = 'block';
+
+            if (vb) {
+              // viewBox="minX minY width height" — use to set preserveAspectRatio and min-height
+              const parts = vb.split(/[\s,]+/);
+              const vbW = parseFloat(parts[2]);
+              const vbH = parseFloat(parts[3]);
+              if (vbW > 0 && vbH > 0) {
+                svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                // Let CSS aspect-ratio handle height; floor at 240px for tiny charts
+                const containerW = containerRef.current.clientWidth || 600;
+                const renderedH = Math.max(240, Math.round((vbH / vbW) * containerW));
+                svgEl.style.height = `${renderedH}px`;
+              }
+            } else if (naturalW > 0 && naturalH > 0) {
+              const containerW = containerRef.current.clientWidth || 600;
+              const renderedH = Math.max(240, Math.round((naturalH / naturalW) * containerW));
+              svgEl.style.height = `${renderedH}px`;
+            } else {
+              svgEl.style.minHeight = '240px';
+            }
           }
           setRendered(true);
         }
       } catch (e) {
         if (!cancelled) {
-          // Log for debugging but don't surface raw parse error to user
-          console.warn('[MermaidChart] Render failed after sanitization:', e);
+          console.warn('[MermaidChart] Render failed. Clean chart was:\n', sanitizeMermaid(chart));
+          console.warn('[MermaidChart] Error:', e);
           setError('fallback');
         }
       }
@@ -133,8 +177,8 @@ export function MermaidChart({ chart }: MermaidChartProps) {
     <div
       ref={containerRef}
       className={cn(
-        'mermaid-container w-full overflow-x-auto rounded-card bg-surface p-4 transition-opacity duration-500',
-        rendered ? 'opacity-100' : 'opacity-0 min-h-[120px]'
+        'mermaid-container w-full rounded-card bg-surface p-6 transition-opacity duration-500',
+        rendered ? 'opacity-100' : 'opacity-0 min-h-[240px]'
       )}
     />
   );
