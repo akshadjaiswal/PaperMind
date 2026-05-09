@@ -30,6 +30,7 @@ export default function Home() {
     setOutput,
     setStatus,
     setError,
+    saveToHistory,
   } = usePaperMindStore();
 
   // Results stored in Zustand, not query cache — no invalidateQueries needed
@@ -61,6 +62,7 @@ export default function Home() {
       } else if (data.output) {
         setOutput(data.output);
         setStatus('done');
+        saveToHistory(topic, selectedIds.length, data.output);
       }
     },
     onError: () => {

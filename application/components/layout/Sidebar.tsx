@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { Trash2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePaperMindStore } from '@/lib/store';
 
 const NavLink = ({ href, label }: { href: string; label: string }) => {
   const { pathname } = useRouter();
@@ -20,7 +22,20 @@ const NavLink = ({ href, label }: { href: string; label: string }) => {
   );
 };
 
+function formatAge(ts: number): string {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60_000);
+  const hours = Math.floor(diff / 3_600_000);
+  const days = Math.floor(diff / 86_400_000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
 export function Sidebar() {
+  const { history, loadFromHistory, deleteFromHistory } = usePaperMindStore();
+
   return (
     <aside className="flex flex-col h-full bg-surface border-r border-border w-64 shrink-0">
       {/* Logo */}
@@ -39,10 +54,54 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="px-3 pt-4 pb-2 space-y-1 border-b border-border">
         <NavLink href="/" label="Research" />
         <NavLink href="/about" label="About" />
       </nav>
+
+      {/* History */}
+      <div className="flex-1 overflow-y-auto">
+        {history.length > 0 ? (
+          <div className="px-3 py-3">
+            <div className="flex items-center gap-2 px-1 mb-2">
+              <Clock size={11} className="text-app-text/30" />
+              <span className="text-[11px] font-sans font-medium text-app-text/35 uppercase tracking-wider">
+                Recent
+              </span>
+            </div>
+            <ul className="space-y-0.5">
+              {history.map((entry) => (
+                <li key={entry.id} className="group flex items-start gap-1">
+                  <button
+                    onClick={() => loadFromHistory(entry)}
+                    className="flex-1 text-left px-2.5 py-2 rounded-xl hover:bg-surface-raised transition-colors duration-150 min-w-0"
+                  >
+                    <p className="text-xs font-medium text-app-text/75 truncate leading-tight">
+                      {entry.topic}
+                    </p>
+                    <p className="text-[10px] text-app-text/35 font-sans mt-0.5">
+                      {entry.paperCount} papers · {formatAge(entry.createdAt)}
+                    </p>
+                  </button>
+                  <button
+                    onClick={() => deleteFromHistory(entry.id)}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 mt-1 rounded-lg text-app-text/25 hover:text-interactive hover:bg-secondary/30 transition-all duration-150 shrink-0"
+                    aria-label="Delete from history"
+                  >
+                    <Trash2 size={11} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="px-5 py-4">
+            <p className="text-[11px] text-app-text/25 font-sans leading-relaxed">
+              Completed research will appear here.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Footer */}
       <div className="px-5 py-4 border-t border-border">

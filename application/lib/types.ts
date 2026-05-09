@@ -42,6 +42,14 @@ export interface OutputObject {
   references: Reference[];
 }
 
+export interface HistoryEntry {
+  id: string;
+  topic: string;
+  createdAt: number;
+  paperCount: number;
+  output: OutputObject;
+}
+
 export interface SearchRequest {
   topic: string;
   sources: PaperSource;
