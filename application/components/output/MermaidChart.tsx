@@ -10,28 +10,42 @@ interface MermaidChartProps {
  * LLMs frequently output invalid arrow/label combinations.
  */
 function sanitizeMermaid(raw: string): string {
-  return (
-    raw
-      // Strip markdown code fences
-      .replace(/^```(?:mermaid)?\s*/im, '')
-      .replace(/\s*```\s*$/m, '')
-      .trim()
-      // Fix -->|label|> — stray > after closing label pipe
-      .replace(/(\|[^|]*\|)>/g, '$1')
-      // Fix ==>|label|> and -.->|label|> variants
-      .replace(/(==\|[^|]*\|)>/g, '$1')
-      .replace(/(-\.-\|[^|]*\|)>/g, '$1')
-      // Fix double-arrow heads like -->> or ==>> (invalid in flowchart LR/TD)
-      .replace(/-->>/g, '-->')
-      .replace(/==>>/g, '==>')
-      // Fix |>label| — pipe arrow label that starts with >
-      .replace(/\|>(.*?)\|/g, '|$1|')
-      // Fix unclosed brackets: [label without closing]
-      // Only fixable per-line safely — skip, mermaid gives decent error for these
-      // Normalize smart quotes that LLMs sometimes emit
-      .replace(/[""]/g, '"')
-      .replace(/['']/g, "'")
-  );
+  let s = raw
+    // Strip markdown code fences
+    .replace(/^```(?:mermaid)?\s*/im, '')
+    .replace(/\s*```\s*$/m, '')
+    .trim();
+
+  // If LLM output is a single line with literal \n sequences, decode them
+  if (!s.includes('\n') && s.includes('\\n')) {
+    s = s.replace(/\\n/g, '\n');
+  }
+
+  // If still single-line flowchart, split on node transition patterns to add newlines
+  // e.g. "graph LR A[x] --> B[y] --> C[z]" → multi-line
+  if (!s.includes('\n') && /^(graph|flowchart)\s/i.test(s)) {
+    // Split after the graph directive line, then add newline before each arrow segment
+    s = s
+      .replace(/^((graph|flowchart)\s+\w+)\s+/i, '$1\n')
+      .replace(/\s+([\w"']+[\[({>])/g, '\n$1');
+  }
+
+  // If no diagram type declaration, prepend graph LR
+  if (!/^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|mindmap|timeline)/i.test(s.trimStart())) {
+    s = 'graph LR\n' + s;
+  }
+
+  return s
+    // Fix -->|label|> — stray > after closing label pipe
+    .replace(/(\|[^|\n]*\|)>/g, '$1')
+    // Fix double-arrow heads
+    .replace(/-->>/g, '-->')
+    .replace(/==>>/g, '==>')
+    // Fix |>label| — pipe that starts with >
+    .replace(/\|>(.*?)\|/g, '|$1|')
+    // Normalize smart quotes
+    .replace(/[""]/g, '"')
+    .replace(/['']/g, "'");
 }
 
 export function MermaidChart({ chart }: MermaidChartProps) {

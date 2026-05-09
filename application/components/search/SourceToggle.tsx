@@ -15,7 +15,7 @@ interface SourceToggleProps {
 
 export function SourceToggle({ value, onChange, disabled }: SourceToggleProps) {
   return (
-    <div className="flex items-center gap-1 bg-surface-raised rounded-pill p-1 border border-border">
+    <div className="flex items-center bg-surface-raised rounded-pill border border-border/60 p-0.5 gap-0.5">
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
@@ -23,10 +23,10 @@ export function SourceToggle({ value, onChange, disabled }: SourceToggleProps) {
           disabled={disabled}
           onClick={() => onChange(opt.value)}
           className={cn(
-            'px-3 py-1 rounded-pill text-xs font-medium transition-all duration-200 whitespace-nowrap',
+            'px-2.5 py-1 rounded-pill text-[11px] font-medium transition-all duration-200 whitespace-nowrap leading-none',
             value === opt.value
               ? 'bg-primary text-white shadow-soft-sm'
-              : 'text-app-text/55 hover:text-app-text hover:bg-border/50',
+              : 'text-app-text/45 hover:text-app-text/75',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >

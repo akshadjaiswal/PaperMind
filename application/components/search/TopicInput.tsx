@@ -25,7 +25,11 @@ interface TopicInputProps {
 export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
   const { sources, setSources, topic, setTopic } = usePaperMindStore();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { topic },
   });
@@ -37,23 +41,29 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
 
   return (
     <div className="w-full">
-      {/* Main input card */}
       <motion.div
         animate={
           isLoading
-            ? { boxShadow: ['0 0 0 2px #8C9A84', '0 0 0 4px rgba(140,154,132,0.3)', '0 0 0 2px #8C9A84'] }
+            ? {
+                boxShadow: [
+                  '0 0 0 2px #8C9A84',
+                  '0 0 0 4px rgba(140,154,132,0.3)',
+                  '0 0 0 2px #8C9A84',
+                ],
+              }
             : { boxShadow: '0 4px 16px rgba(45,58,49,0.08)' }
         }
         transition={isLoading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
         className="bg-surface rounded-card border border-border overflow-hidden"
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex items-center gap-3 px-5 py-4">
+          {/* Search row */}
+          <div className="flex items-center gap-3 px-4 py-3.5">
             <div className="shrink-0">
               {isLoading ? (
-                <Loader2 size={20} className="text-primary animate-spin" />
+                <Loader2 size={18} className="text-primary animate-spin" />
               ) : (
-                <Search size={20} className="text-app-text/35" />
+                <Search size={18} className="text-app-text/35" />
               )}
             </div>
             <input
@@ -62,7 +72,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
               placeholder="Enter a research topic…"
               disabled={isLoading}
               className={cn(
-                'flex-1 bg-transparent outline-none text-app-text font-sans text-base',
+                'flex-1 bg-transparent outline-none text-app-text font-sans text-sm',
                 'placeholder:text-app-text/35 disabled:opacity-60 min-w-0'
               )}
               autoComplete="off"
@@ -70,21 +80,23 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
             <button
               type="submit"
               disabled={isLoading}
-              className="shrink-0 rounded-pill bg-interactive text-white px-5 py-2 text-sm font-medium hover:bg-interactive-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft-sm"
+              className="shrink-0 rounded-pill bg-interactive text-white px-4 py-1.5 text-sm font-medium hover:bg-interactive-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft-sm"
             >
               {isLoading ? 'Searching…' : 'Search'}
             </button>
           </div>
 
-          {/* Source toggle row */}
-          <div className="flex items-center gap-3 px-5 pb-4 pt-0 border-t border-border/50">
-            <span className="text-xs text-app-text/40 font-sans">Sources:</span>
+          {/* Source toggle row — tighter, flush bottom */}
+          <div className="flex items-center gap-2.5 px-4 pb-3 pt-0">
+            <span className="text-[11px] text-app-text/35 font-sans shrink-0 leading-none">
+              Sources
+            </span>
+            <div className="w-px h-3 bg-border shrink-0" />
             <SourceToggle value={sources} onChange={setSources} disabled={isLoading} />
           </div>
         </form>
       </motion.div>
 
-      {/* Validation error */}
       {errors.topic && (
         <p className="text-xs text-interactive mt-2 px-1 font-sans">{errors.topic.message}</p>
       )}

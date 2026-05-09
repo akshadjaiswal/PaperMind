@@ -1,5 +1,5 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePaperMindStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
@@ -10,52 +10,56 @@ interface GenerateButtonProps {
 export function GenerateButton({ onClick }: GenerateButtonProps) {
   const { selectedIds, status } = usePaperMindStore();
   const isGenerating = status === 'generating';
-  const canGenerate = selectedIds.length >= 3;
-  const isDisabled = !canGenerate || isGenerating;
+  const count = selectedIds.length;
+  const canGenerate = count >= 3;
+  const hasAny = count >= 1;
 
-  const button = (
-    <button
-      onClick={onClick}
-      disabled={isDisabled}
-      className={cn(
-        'w-full rounded-pill py-3.5 px-8 text-sm font-medium transition-all duration-200',
-        'flex items-center justify-center gap-2',
-        'shadow-soft-sm hover:shadow-soft-md',
-        canGenerate && !isGenerating
-          ? 'bg-interactive text-white hover:bg-interactive-hover'
-          : 'bg-app-text/10 text-app-text/40 cursor-not-allowed',
-        isGenerating && 'bg-interactive/70 text-white cursor-wait'
+  return (
+    <AnimatePresence>
+      {(hasAny || isGenerating) && (
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="fixed bottom-6 left-0 right-0 z-30 flex justify-center pointer-events-none px-5 md:pl-[calc(256px+1.25rem)]"
+        >
+          <div className="pointer-events-auto w-full max-w-sm">
+            <motion.button
+              onClick={canGenerate && !isGenerating ? onClick : undefined}
+              disabled={!canGenerate || isGenerating}
+              whileHover={canGenerate && !isGenerating ? { scale: 1.02 } : {}}
+              whileTap={canGenerate && !isGenerating ? { scale: 0.98 } : {}}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                'w-full rounded-pill py-3.5 px-8 text-sm font-medium',
+                'flex items-center justify-center gap-2',
+                'transition-all duration-300',
+                'backdrop-blur-sm',
+                canGenerate && !isGenerating
+                  ? 'bg-interactive text-white shadow-soft-xl hover:bg-interactive-hover cursor-pointer'
+                  : isGenerating
+                  ? 'bg-interactive/80 text-white shadow-soft-lg cursor-wait'
+                  : 'bg-app-text/15 text-app-text/45 shadow-soft-md cursor-not-allowed backdrop-blur-none'
+              )}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  Synthesizing…
+                </>
+              ) : (
+                <>
+                  <Sparkles size={15} />
+                  {canGenerate
+                    ? `Synthesize ${count} paper${count !== 1 ? 's' : ''}`
+                    : `Select ${3 - count} more to synthesize`}
+                </>
+              )}
+            </motion.button>
+          </div>
+        </motion.div>
       )}
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 size={16} className="animate-spin" />
-          Synthesizing…
-        </>
-      ) : (
-        <>
-          <Sparkles size={16} />
-          Synthesize Research
-        </>
-      )}
-    </button>
+    </AnimatePresence>
   );
-
-  if (!canGenerate && !isGenerating) {
-    return (
-      <TooltipProvider delayDuration={300}>
-        <Tooltip>
-          <TooltipTrigger asChild>{button}</TooltipTrigger>
-          <TooltipContent
-            side="top"
-            className="bg-app-text text-bg text-xs rounded-xl px-3 py-1.5 font-sans"
-          >
-            Select at least 3 papers to synthesize
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-
-  return button;
 }
