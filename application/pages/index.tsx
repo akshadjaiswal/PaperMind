@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useMutation } from '@tanstack/react-query';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { MainLayout } from '@/components/layout/MainLayout';
 import { TopicInput } from '@/components/search/TopicInput';
@@ -33,7 +33,6 @@ export default function Home() {
     saveToHistory,
   } = usePaperMindStore();
 
-  // Results stored in Zustand, not query cache — no invalidateQueries needed
   const searchMutation = useMutation({
     mutationFn: searchPapers,
     gcTime: 0,
@@ -45,7 +44,6 @@ export default function Home() {
     onError: () => setError('search_failure'),
   });
 
-  // Results stored in Zustand, not query cache — no invalidateQueries needed
   const generateMutation = useMutation({
     mutationFn: generateSynthesis,
     gcTime: 0,
@@ -86,7 +84,9 @@ export default function Home() {
   const isError = status === 'error';
   const hasPapers = papers.length > 0;
 
-  // Add bottom padding when floating button is visible
+  // Idle = no papers yet, no output, not generating
+  const isIdle = !hasPapers && !isSearching && !isGenerating && !isDone;
+  // Show floating generate button
   const showFloating = hasPapers && !isGenerating && !isDone;
 
   return (
@@ -95,67 +95,95 @@ export default function Home() {
         <title>PaperMind: AI Research Synthesis</title>
       </Head>
       <MainLayout>
-        <div
-          className="max-w-2xl mx-auto px-5 py-8 w-full space-y-6"
-          style={{ paddingBottom: showFloating ? '5rem' : undefined }}
-        >
-          {/* Header */}
-          {!isDone && (
-            <AnimatedSection delay={0}>
-              <div className="mb-2">
-                <h1 className="font-serif text-3xl font-semibold text-app-text leading-tight">
+        {/* ── IDLE STATE: Claude-style centered hero + sticky bottom input ── */}
+        {isIdle && !isError && (
+          <div className="relative flex flex-col min-h-full">
+            {/* Centered hero */}
+            <div className="flex-1 flex flex-col items-center justify-center px-5 pb-40">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="w-full max-w-2xl text-center mb-8"
+              >
+                <h1 className="font-serif text-4xl font-semibold text-app-text leading-tight mb-3">
                   Research Synthesis
                 </h1>
-                <p className="font-sans text-sm text-app-text/45 mt-1">
-                  Search peer-reviewed papers, select the relevant ones, and get an AI-synthesized report.
+                <p className="font-sans text-base text-app-text/40 leading-relaxed">
+                  Search peer-reviewed papers, select the relevant ones,<br className="hidden sm:block" /> and get an AI-synthesized report.
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Gradient fade + sticky input at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+              {/* Gradient overlay fading content into the input */}
+              <div className="h-24 bg-gradient-to-t from-bg to-transparent" />
+            </div>
+            <div className="sticky bottom-0 left-0 right-0 pb-6 pt-2 px-5 pointer-events-auto">
+              {/* Subtle bg to match page */}
+              <div className="max-w-2xl mx-auto w-full">
+                <AnimatedSection delay={0.1}>
+                  <TopicInput onSearch={handleSearch} isLoading={isSearching} />
+                </AnimatedSection>
+                <p className="text-center text-[11px] text-app-text/25 font-sans mt-3">
+                  Sources from PubMed &amp; Semantic Scholar · Synthesized by Llama 3.3 on Groq
                 </p>
               </div>
-            </AnimatedSection>
-          )}
+            </div>
+          </div>
+        )}
 
-          {/* Search input */}
-          {!isDone && !isGenerating && (
-            <AnimatedSection delay={0.05}>
-              <TopicInput onSearch={handleSearch} isLoading={isSearching} />
-            </AnimatedSection>
-          )}
-
-          {/* Error message */}
-          <AnimatePresence>
-            {isError && errorType && (
-              <AnimatedSection>
-                <ErrorMessage
-                  errorType={errorType}
-                  retryAfter={retryAfter}
-                  onRetry={errorType !== 'rate_limit' ? handleRetry : undefined}
-                />
-              </AnimatedSection>
-            )}
-          </AnimatePresence>
-
-          {/* Main content — mutually exclusive states */}
-          <AnimatePresence mode="wait">
-            {isGenerating && (
-              <AnimatedSection key="progress" delay={0.1}>
-                <ProgressSteps topic={topic} paperCount={selectedIds.length} />
+        {/* ── ACTIVE STATES: normal scroll layout ── */}
+        {(!isIdle || isError) && (
+          <div
+            className="max-w-2xl mx-auto px-5 py-8 w-full space-y-6"
+            style={{ paddingBottom: showFloating ? '5rem' : undefined }}
+          >
+            {/* Search input — stays at top during active states */}
+            {!isDone && !isGenerating && (
+              <AnimatedSection delay={0}>
+                <TopicInput onSearch={handleSearch} isLoading={isSearching} />
               </AnimatedSection>
             )}
 
-            {isDone && output && (
-              <AnimatedSection key="output" delay={0}>
-                <OutputPanel output={output} />
-              </AnimatedSection>
-            )}
+            {/* Error message */}
+            <AnimatePresence>
+              {isError && errorType && (
+                <AnimatedSection>
+                  <ErrorMessage
+                    errorType={errorType}
+                    retryAfter={retryAfter}
+                    onRetry={errorType !== 'rate_limit' ? handleRetry : undefined}
+                  />
+                </AnimatedSection>
+              )}
+            </AnimatePresence>
 
-            {!isGenerating && !isDone && (hasPapers || isSearching) && (
-              <AnimatedSection key="papers" delay={0.1}>
-                <PaperList warnings={searchMutation.data?.warnings} />
-              </AnimatedSection>
-            )}
-          </AnimatePresence>
-        </div>
+            {/* Main content — mutually exclusive states */}
+            <AnimatePresence mode="wait">
+              {isGenerating && (
+                <AnimatedSection key="progress" delay={0.1}>
+                  <ProgressSteps topic={topic} paperCount={selectedIds.length} />
+                </AnimatedSection>
+              )}
 
-        {/* Floating generate button — always mounted, AnimatePresence inside */}
+              {isDone && output && (
+                <AnimatedSection key="output" delay={0}>
+                  <OutputPanel output={output} />
+                </AnimatedSection>
+              )}
+
+              {!isGenerating && !isDone && (hasPapers || isSearching) && (
+                <AnimatedSection key="papers" delay={0.1}>
+                  <PaperList warnings={searchMutation.data?.warnings} />
+                </AnimatedSection>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Floating generate button */}
         <GenerateButton onClick={handleGenerate} />
       </MainLayout>
     </>

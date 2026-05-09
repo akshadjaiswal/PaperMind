@@ -105,9 +105,16 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-border space-y-3">
-        <ThemeToggle />
-        <div>
+      <div className="px-4 py-4 border-t border-border">
+        {/* Appearance row */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] text-app-text/35 font-sans font-medium uppercase tracking-wider">
+            Appearance
+          </span>
+          <ThemeToggle />
+        </div>
+        {/* Divider */}
+        <div className="border-t border-border/50 pt-3">
           <p className="text-[11px] text-app-text/30 font-sans leading-relaxed">
             Powered by Groq &amp; Llama 3.3
           </p>

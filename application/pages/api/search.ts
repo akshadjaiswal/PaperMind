@@ -28,10 +28,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     semanticResult.status === 'fulfilled' ? semanticResult.value : [];
 
   if (pubmedResult.status === 'rejected' && sources !== 'semantic') {
-    warnings.push('PubMed is temporarily unavailable. Showing Semantic Scholar results only.');
+    console.warn('[search] PubMed failed:', (pubmedResult as PromiseRejectedResult).reason);
+    warnings.push('PubMed returned an error — showing Semantic Scholar results only.');
   }
   if (semanticResult.status === 'rejected' && sources !== 'pubmed') {
-    warnings.push('Semantic Scholar is temporarily unavailable. Showing PubMed results only.');
+    console.warn('[search] Semantic Scholar failed:', (semanticResult as PromiseRejectedResult).reason);
+    warnings.push('Semantic Scholar returned an error — showing PubMed results only. Add a free SEMANTIC_SCHOLAR_API_KEY to fix this.');
   }
 
   const allPapers = [...pubmedPapers, ...semanticPapers];
@@ -170,9 +172,23 @@ function parsePubMedXml(xml: string): Paper[] {
 
 async function fetchSemantic(topic: string): Promise<Paper[]> {
   const encoded = encodeURIComponent(topic);
-  const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encoded}&limit=10&fields=title,authors,year,abstract,externalIds,openAccessPdf`;
+  const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encoded}&limit=10&fields=title,authors,year,abstract,externalIds,openAccessPdf,venue`;
 
-  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+  const headers: Record<string, string> = {
+    'User-Agent': 'PaperMind/1.0 (papermind@erlin.ai)',
+  };
+  const apiKey = process.env.SEMANTIC_SCHOLAR_API_KEY;
+  if (apiKey) headers['x-api-key'] = apiKey;
+
+  // Retry once on 429 with backoff
+  let res = await fetch(url, { headers, signal: AbortSignal.timeout(12_000) });
+
+  if (res.status === 429) {
+    const retryAfter = Number(res.headers.get('Retry-After') ?? 2);
+    await new Promise((r) => setTimeout(r, Math.min(retryAfter * 1000, 5000)));
+    res = await fetch(url, { headers, signal: AbortSignal.timeout(12_000) });
+  }
+
   if (!res.ok) throw new Error(`Semantic Scholar failed: ${res.status}`);
 
   const data = await res.json();
@@ -193,6 +209,8 @@ async function fetchSemantic(topic: string): Promise<Paper[]> {
       const openAccess = p?.openAccessPdf as Record<string, unknown> | undefined;
       const pdf_url = String(openAccess?.url ?? '').trim() || null;
 
+      const journal = String(p?.venue ?? '').trim() || null;
+
       return [
         {
           id: `semantic_${String(p?.paperId ?? Math.random())}`,
@@ -200,7 +218,7 @@ async function fetchSemantic(topic: string): Promise<Paper[]> {
           title,
           authors: authors || 'Unknown authors',
           year: Number(p?.year) || null,
-          journal: null,
+          journal,
           abstract: String(p?.abstract ?? '') || 'No abstract available.',
           doi,
           pdf_url,

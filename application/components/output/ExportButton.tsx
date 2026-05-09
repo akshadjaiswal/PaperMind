@@ -19,10 +19,12 @@ const SECTION_LABELS: { key: keyof OutputObject; label: string }[] = [
 
 function buildPrintClone(output: OutputObject): HTMLDivElement {
   const wrap = document.createElement('div');
+  // Must be in viewport for html2canvas to capture — use opacity:0 + pointer-events:none
+  // position:absolute left:-9999px causes blank pages in html2canvas
   wrap.style.cssText = [
-    'position:absolute',
-    'left:-9999px',
+    'position:fixed',
     'top:0',
+    'left:0',
     'width:740px',
     'padding:48px 56px',
     'background:#F9F8F4',
@@ -30,6 +32,10 @@ function buildPrintClone(output: OutputObject): HTMLDivElement {
     'font-family:"Source Sans 3",system-ui,sans-serif',
     'font-size:14px',
     'line-height:1.7',
+    'opacity:0',
+    'pointer-events:none',
+    'z-index:-1',
+    'overflow:visible',
   ].join(';');
 
   // Title

@@ -10,13 +10,14 @@ interface GenerateButtonProps {
 export function GenerateButton({ onClick }: GenerateButtonProps) {
   const { selectedIds, status } = usePaperMindStore();
   const isGenerating = status === 'generating';
+  const isDone = status === 'done';
   const count = selectedIds.length;
   const canGenerate = count >= 3;
   const hasAny = count >= 1;
 
   return (
     <AnimatePresence>
-      {(hasAny || isGenerating) && (
+      {!isDone && (hasAny || isGenerating) && (
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
