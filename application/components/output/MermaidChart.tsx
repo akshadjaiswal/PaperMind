@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
 
 interface MermaidChartProps {
@@ -86,7 +87,8 @@ export function MermaidChart({ chart }: MermaidChartProps) {
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
-          securityLevel: 'loose',
+          securityLevel: 'antiscript',
+          htmlLabels: false,
           themeVariables: isDark
             ? {
                 primaryColor: '#2a3327',
@@ -136,7 +138,9 @@ export function MermaidChart({ chart }: MermaidChartProps) {
         }
 
         if (!cancelled && containerRef.current) {
-          containerRef.current.innerHTML = svg;
+          containerRef.current.innerHTML = DOMPurify.sanitize(svg, {
+            USE_PROFILES: { svg: true, svgFilters: true },
+          });
           const svgEl = containerRef.current.querySelector('svg');
           if (svgEl) {
             // Read natural dimensions from viewBox before stripping width/height attributes
