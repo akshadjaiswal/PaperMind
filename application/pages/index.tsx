@@ -1,8 +1,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { m } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 
-import { MainLayout } from '@/components/layout/MainLayout';
 import { MeshBackground } from '@/components/layout/MeshBackground';
 
 const TOPIC_CHIPS = [
@@ -39,11 +38,12 @@ export default function Home() {
           content="Turn any research topic into a structured academic synthesis. Real papers, real citations, AI-powered."
         />
       </Head>
-      <MainLayout>
+      <LazyMotion features={domAnimation}>
+        <div className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-bg">
         <MeshBackground />
 
         {/* Single screen, vertically centered */}
-        <div className="flex h-full items-center justify-center px-6 py-8">
+        <div className="flex h-full w-full items-center justify-center px-6 py-8">
           <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,7 +143,8 @@ export default function Home() {
             </m.div>
           </m.div>
         </div>
-      </MainLayout>
+        </div>
+      </LazyMotion>
     </>
   );
 }

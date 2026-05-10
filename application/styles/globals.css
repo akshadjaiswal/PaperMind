@@ -113,78 +113,79 @@
 .mesh-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.45;
+  filter: blur(48px);
   will-change: transform;
 }
 
 .mesh-orb-1 {
-  width: 600px;
-  height: 600px;
-  background: #8c9a84;
-  top: -10%;
-  left: -15%;
-  animation: meshDrift1 18s ease-in-out infinite;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, #6b8f6e 0%, #8c9a84 60%, transparent 100%);
+  top: -15%;
+  left: -20%;
+  opacity: 0.75;
+  animation: meshDrift1 10s ease-in-out infinite;
 }
 
 .mesh-orb-2 {
-  width: 500px;
-  height: 500px;
-  background: #dccfc2;
-  top: 30%;
-  right: -10%;
-  animation: meshDrift2 22s ease-in-out infinite;
-  animation-delay: -6s;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, #c4a882 0%, #dccfc2 60%, transparent 100%);
+  top: 25%;
+  right: -15%;
+  opacity: 0.7;
+  animation: meshDrift2 13s ease-in-out infinite;
+  animation-delay: -4s;
 }
 
 .mesh-orb-3 {
-  width: 400px;
-  height: 400px;
-  background: #c27b66;
-  bottom: -10%;
-  left: 25%;
-  animation: meshDrift3 26s ease-in-out infinite;
-  animation-delay: -12s;
-  opacity: 0.22;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, #c27b66 0%, #d4957e 60%, transparent 100%);
+  bottom: -15%;
+  left: 20%;
+  opacity: 0.55;
+  animation: meshDrift3 11s ease-in-out infinite;
+  animation-delay: -7s;
 }
 
 .mesh-orb-4 {
-  width: 350px;
-  height: 350px;
-  background: #f4f2ee;
-  top: 50%;
-  left: 40%;
-  animation: meshDrift4 20s ease-in-out infinite;
-  animation-delay: -4s;
-  opacity: 0.35;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #7a9e85 0%, #a8c4a2 60%, transparent 100%);
+  top: 45%;
+  left: 35%;
+  opacity: 0.5;
+  animation: meshDrift4 9s ease-in-out infinite;
+  animation-delay: -2s;
 }
 
-.dark .mesh-orb-1 { background: #2a3327; opacity: 0.6; }
-.dark .mesh-orb-2 { background: #2e2a26; opacity: 0.5; }
-.dark .mesh-orb-3 { background: #3a1f18; opacity: 0.35; }
-.dark .mesh-orb-4 { background: #212620; opacity: 0.4; }
+.dark .mesh-orb-1 { background: radial-gradient(circle, #3d5c42 0%, #2a3d2e 60%, transparent 100%); opacity: 0.8; }
+.dark .mesh-orb-2 { background: radial-gradient(circle, #4a3828 0%, #332820 60%, transparent 100%); opacity: 0.7; }
+.dark .mesh-orb-3 { background: radial-gradient(circle, #6b3a2a 0%, #4a2818 60%, transparent 100%); opacity: 0.6; }
+.dark .mesh-orb-4 { background: radial-gradient(circle, #2a4a30 0%, #1e3524 60%, transparent 100%); opacity: 0.55; }
 
 @keyframes meshDrift1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(60px, 40px) scale(1.08); }
-  66% { transform: translate(-40px, 80px) scale(0.95); }
+  33% { transform: translate(80px, 60px) scale(1.12); }
+  66% { transform: translate(-50px, 100px) scale(0.92); }
 }
 
 @keyframes meshDrift2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  40% { transform: translate(-80px, -50px) scale(1.1); }
-  70% { transform: translate(50px, 60px) scale(0.92); }
+  40% { transform: translate(-100px, -70px) scale(1.15); }
+  70% { transform: translate(60px, 80px) scale(0.88); }
 }
 
 @keyframes meshDrift3 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(70px, -60px) scale(1.05); }
+  50% { transform: translate(90px, -80px) scale(1.1); }
 }
 
 @keyframes meshDrift4 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  30% { transform: translate(-50px, 40px) scale(1.12); }
-  70% { transform: translate(60px, -30px) scale(0.9); }
+  30% { transform: translate(-70px, 50px) scale(1.18); }
+  70% { transform: translate(80px, -40px) scale(0.85); }
 }
 
 /* Paper grain texture — mandatory, applied on <body class="grain-overlay"> */
