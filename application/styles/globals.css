@@ -109,6 +109,84 @@
   }
 }
 
+/* Mesh gradient orbs — homepage animated background */
+.mesh-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  will-change: transform;
+}
+
+.mesh-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: #8c9a84;
+  top: -10%;
+  left: -15%;
+  animation: meshDrift1 18s ease-in-out infinite;
+}
+
+.mesh-orb-2 {
+  width: 500px;
+  height: 500px;
+  background: #dccfc2;
+  top: 30%;
+  right: -10%;
+  animation: meshDrift2 22s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+.mesh-orb-3 {
+  width: 400px;
+  height: 400px;
+  background: #c27b66;
+  bottom: -10%;
+  left: 25%;
+  animation: meshDrift3 26s ease-in-out infinite;
+  animation-delay: -12s;
+  opacity: 0.22;
+}
+
+.mesh-orb-4 {
+  width: 350px;
+  height: 350px;
+  background: #f4f2ee;
+  top: 50%;
+  left: 40%;
+  animation: meshDrift4 20s ease-in-out infinite;
+  animation-delay: -4s;
+  opacity: 0.35;
+}
+
+.dark .mesh-orb-1 { background: #2a3327; opacity: 0.6; }
+.dark .mesh-orb-2 { background: #2e2a26; opacity: 0.5; }
+.dark .mesh-orb-3 { background: #3a1f18; opacity: 0.35; }
+.dark .mesh-orb-4 { background: #212620; opacity: 0.4; }
+
+@keyframes meshDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, 40px) scale(1.08); }
+  66% { transform: translate(-40px, 80px) scale(0.95); }
+}
+
+@keyframes meshDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-80px, -50px) scale(1.1); }
+  70% { transform: translate(50px, 60px) scale(0.92); }
+}
+
+@keyframes meshDrift3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(70px, -60px) scale(1.05); }
+}
+
+@keyframes meshDrift4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  30% { transform: translate(-50px, 40px) scale(1.12); }
+  70% { transform: translate(60px, -30px) scale(0.9); }
+}
+
 /* Paper grain texture — mandatory, applied on <body class="grain-overlay"> */
 .grain-overlay::after {
   content: '';

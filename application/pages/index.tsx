@@ -1,191 +1,184 @@
 import Head from 'next/head';
-import { useMutation } from '@tanstack/react-query';
-import { AnimatePresence, m } from 'framer-motion';
+import { useRouter } from 'next/router';
+import { m } from 'framer-motion';
 
 import { MainLayout } from '@/components/layout/MainLayout';
-import { TopicInput } from '@/components/search/TopicInput';
-import { PaperList } from '@/components/search/PaperList';
-import { GenerateButton } from '@/components/search/GenerateButton';
-import { ProgressSteps } from '@/components/output/ProgressSteps';
-import { OutputPanel } from '@/components/output/OutputPanel';
-import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { AnimatedSection } from '@/components/ui/AnimatedSection';
+import { MeshBackground } from '@/components/layout/MeshBackground';
 
-import { usePaperMindStore } from '@/lib/store';
-import { searchPapers } from '@/lib/api/search';
-import { generateSynthesis } from '@/lib/api/generate';
-import type { PaperSource } from '@/lib/types';
+const TOPIC_CHIPS = [
+  'transformer attention mechanism',
+  'CRISPR gene editing',
+  'gut microbiome depression',
+  'quantum computing error correction',
+];
+
+const SOURCE_BADGES = [
+  { label: 'PubMed', desc: '35M+ papers' },
+  { label: 'Semantic Scholar', desc: '200M+ papers' },
+  { label: 'Groq · Llama 3.3', desc: 'AI synthesis' },
+  { label: 'Unpaywall', desc: 'Free PDFs' },
+];
 
 export default function Home() {
-  const {
-    topic,
-    papers,
-    selectedIds,
-    output,
-    status,
-    errorType,
-    retryAfter,
-    sources,
-    setPapers,
-    setOutput,
-    setStatus,
-    setError,
-    saveToHistory,
-  } = usePaperMindStore();
+  const router = useRouter();
 
-  const searchMutation = useMutation({
-    mutationFn: searchPapers,
-    gcTime: 0,
-    onMutate: () => setStatus('searching'),
-    onSuccess: (data) => {
-      setPapers(data.papers);
-      setStatus('idle');
-    },
-    onError: () => setError('search_failure'),
-  });
-
-  const generateMutation = useMutation({
-    mutationFn: generateSynthesis,
-    gcTime: 0,
-    onMutate: () => setStatus('generating'),
-    onSuccess: (data) => {
-      if (data.error) {
-        setError(data.error, data.retry_after);
-      } else if (data.output) {
-        setOutput(data.output);
-        setStatus('done');
-        saveToHistory(topic, selectedIds.length, data.output);
-      }
-    },
-    onError: () => setError('network'),
-  });
-
-  const handleSearch = (searchTopic: string, searchSources: PaperSource) => {
-    searchMutation.mutate({ topic: searchTopic, sources: searchSources });
-  };
-
-  const handleGenerate = () => {
-    const selectedPapers = papers.filter((p) => selectedIds.includes(p.id));
-    generateMutation.mutate({ topic, papers: selectedPapers });
-  };
-
-  const handleRetry = () => {
-    if (errorType === 'search_failure') {
-      searchMutation.mutate({ topic, sources });
+  const goToResearch = (topic?: string) => {
+    if (topic) {
+      router.push(`/research?topic=${encodeURIComponent(topic)}`);
     } else {
-      const selectedPapers = papers.filter((p) => selectedIds.includes(p.id));
-      generateMutation.mutate({ topic, papers: selectedPapers });
+      router.push('/research');
     }
   };
-
-  const isSearching = status === 'searching';
-  const isGenerating = status === 'generating';
-  const isDone = status === 'done';
-  const isError = status === 'error';
-  const hasPapers = papers.length > 0;
-
-  // Idle = no papers yet, no output, not generating
-  const isIdle = !hasPapers && !isSearching && !isGenerating && !isDone;
-  // Show floating generate button
-  const showFloating = hasPapers && !isGenerating && !isDone;
 
   return (
     <>
       <Head>
-        <title>PaperMind: AI Research Synthesis</title>
+        <title>PaperMind — AI Research Synthesis</title>
+        <meta
+          name="description"
+          content="Turn any research topic into a structured academic synthesis. Real papers, real citations, AI-powered."
+        />
       </Head>
       <MainLayout>
-        {/* ── IDLE STATE: Claude-style centered hero + sticky bottom input ── */}
-        {isIdle && !isError && (
-          <div className="relative flex flex-col min-h-full">
-            {/* Centered hero */}
-            <div className="flex-1 flex flex-col items-center justify-center px-5 pb-40">
-              <m.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="w-full max-w-2xl text-center mb-8"
-              >
-                <h1 className="font-serif text-4xl font-semibold text-app-text leading-tight mb-3">
-                  Research Synthesis
-                </h1>
-                <p className="font-sans text-base text-app-text/40 leading-relaxed">
-                  Search peer-reviewed papers, select the relevant ones,<br className="hidden sm:block" /> and get an AI-synthesized report.
-                </p>
-              </m.div>
-            </div>
+        <MeshBackground />
 
-            {/* Gradient fade + sticky input at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-              {/* Gradient overlay fading content into the input */}
-              <div className="h-24 bg-gradient-to-t from-bg to-transparent" />
-            </div>
-            <div className="sticky bottom-0 left-0 right-0 pb-6 pt-2 px-5 pointer-events-auto">
-              {/* Subtle bg to match page */}
-              <div className="max-w-2xl mx-auto w-full">
-                <AnimatedSection delay={0.1}>
-                  <TopicInput onSearch={handleSearch} isLoading={isSearching} />
-                </AnimatedSection>
-                <p className="text-center text-[11px] text-app-text/25 font-sans mt-3">
-                  Sources from PubMed &amp; Semantic Scholar · Synthesized by Llama 3.3 on Groq
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── ACTIVE STATES: normal scroll layout ── */}
-        {(!isIdle || isError) && (
-          <div
-            className="max-w-2xl mx-auto px-5 py-8 w-full space-y-6"
-            style={{ paddingBottom: showFloating ? '5rem' : undefined }}
+        {/* Single screen, vertically centered */}
+        <div className="flex h-full items-center justify-center px-6 py-8">
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="max-w-lg w-full text-center space-y-8"
           >
-            {/* Search input — stays at top during active states */}
-            {!isDone && !isGenerating && (
-              <AnimatedSection delay={0}>
-                <TopicInput onSearch={handleSearch} isLoading={isSearching} />
-              </AnimatedSection>
-            )}
+            {/* Logo mark */}
+            <m.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="flex items-center justify-center gap-2.5"
+            >
+              <div className="size-10 rounded-2xl bg-primary/15 flex items-center justify-center backdrop-blur-sm">
+                <LeafIconLg />
+              </div>
+              <span className="font-serif text-2xl font-semibold text-app-text tracking-tight">
+                PaperMind
+              </span>
+            </m.div>
 
-            {/* Error message */}
-            <AnimatePresence>
-              {isError && errorType && (
-                <AnimatedSection>
-                  <ErrorMessage
-                    errorType={errorType}
-                    retryAfter={retryAfter}
-                    onRetry={errorType !== 'rate_limit' ? handleRetry : undefined}
-                  />
-                </AnimatedSection>
-              )}
-            </AnimatePresence>
+            {/* Headline */}
+            <m.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-app-text leading-tight mb-4">
+                Research Synthesis,
+                <br />
+                <span className="text-primary">Grounded in Real Papers.</span>
+              </h1>
+              <p className="font-sans text-base text-app-text/55 leading-relaxed max-w-md mx-auto">
+                Search peer-reviewed papers from PubMed and Semantic Scholar,
+                select the ones that matter, and get a structured AI-synthesized
+                report in seconds.
+              </p>
+            </m.div>
 
-            {/* Main content — mutually exclusive states */}
-            <AnimatePresence mode="wait">
-              {isGenerating && (
-                <AnimatedSection key="progress" delay={0.1}>
-                  <ProgressSteps topic={topic} paperCount={selectedIds.length} />
-                </AnimatedSection>
-              )}
+            {/* Source badges */}
+            <m.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex justify-center gap-2 flex-wrap"
+            >
+              {SOURCE_BADGES.map((b) => (
+                <div
+                  key={b.label}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-surface/70 backdrop-blur-sm border border-border text-xs font-sans shadow-soft-sm"
+                >
+                  <span className="font-medium text-app-text/80">{b.label}</span>
+                  <span className="text-app-text/35">{b.desc}</span>
+                </div>
+              ))}
+            </m.div>
 
-              {isDone && output && (
-                <AnimatedSection key="output" delay={0}>
-                  <OutputPanel output={output} />
-                </AnimatedSection>
-              )}
+            {/* Example topic chips */}
+            <m.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="space-y-2"
+            >
+              <p className="text-[11px] font-sans font-medium text-app-text/35 uppercase tracking-wider">
+                Try a topic
+              </p>
+              <div className="flex justify-center gap-2 flex-wrap">
+                {TOPIC_CHIPS.map((chip) => (
+                  <button
+                    key={chip}
+                    onClick={() => goToResearch(chip)}
+                    className="px-3 py-1.5 rounded-pill bg-surface/60 backdrop-blur-sm border border-border text-xs font-sans text-app-text/65 hover:text-app-text hover:bg-surface hover:border-primary/40 hover:shadow-soft-sm transition-all duration-200"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </m.div>
 
-              {!isGenerating && !isDone && (hasPapers || isSearching) && (
-                <AnimatedSection key="papers" delay={0.1}>
-                  <PaperList warnings={searchMutation.data?.warnings} />
-                </AnimatedSection>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Floating generate button */}
-        <GenerateButton onClick={handleGenerate} />
+            {/* Primary CTA */}
+            <m.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <button
+                onClick={() => goToResearch()}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-pill bg-interactive text-white font-sans font-semibold text-sm hover:bg-interactive-hover shadow-soft-md hover:shadow-soft-lg transition-all duration-200 hover:-translate-y-0.5"
+              >
+                Start Researching
+                <ArrowRight />
+              </button>
+              <p className="text-[11px] text-app-text/30 font-sans mt-4">
+                No sign-up · No database · Free to use
+              </p>
+            </m.div>
+          </m.div>
+        </div>
       </MainLayout>
     </>
+  );
+}
+
+function LeafIconLg() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#8C9A84"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+    </svg>
+  );
+}
+
+function ArrowRight() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
   );
 }

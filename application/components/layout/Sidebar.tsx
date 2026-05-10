@@ -35,20 +35,21 @@ function formatAge(ts: number): string {
 }
 
 export function Sidebar() {
+  const router = useRouter();
   const { history, loadFromHistory, deleteFromHistory } = usePaperMindStore();
 
   return (
     <aside className="flex flex-col h-full bg-surface border-r border-border w-64 shrink-0">
       {/* Logo */}
       <div className="px-5 py-6 border-b border-border">
-        <div className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
           <div className="size-8 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
             <LeafIcon />
           </div>
           <span className="font-serif text-lg font-semibold text-app-text tracking-tight">
             PaperMind
           </span>
-        </div>
+        </Link>
         <p className="text-xs text-app-text/40 mt-1.5 font-sans pl-0.5">
           AI Research Synthesis
         </p>
@@ -56,7 +57,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="px-3 pt-4 pb-2 space-y-1 border-b border-border">
-        <NavLink href="/" label="Research" />
+        <NavLink href="/research" label="Research" />
         <NavLink href="/about" label="About" />
       </nav>
 
@@ -74,7 +75,7 @@ export function Sidebar() {
               {history.map((entry) => (
                 <li key={entry.id} className="group flex items-start gap-1">
                   <button
-                    onClick={() => loadFromHistory(entry)}
+                    onClick={() => { loadFromHistory(entry); router.push('/research'); }}
                     className="flex-1 text-left px-2.5 py-2 rounded-xl hover:bg-surface-raised transition-colors duration-150 min-w-0"
                   >
                     <p className="text-xs font-medium text-app-text/75 truncate leading-tight">
