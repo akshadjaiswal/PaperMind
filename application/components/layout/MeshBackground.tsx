@@ -1,7 +1,7 @@
 export function MeshBackground() {
   return (
     <div
-      className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
+      className="absolute inset-0 overflow-hidden pointer-events-none"
       aria-hidden="true"
     >
       <div className="mesh-orb mesh-orb-1" />

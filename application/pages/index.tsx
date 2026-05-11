@@ -39,7 +39,7 @@ export default function Home() {
         />
       </Head>
       <LazyMotion features={domAnimation}>
-        <div className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-bg">
+        <div className="relative flex h-screen w-full items-center justify-center overflow-hidden">
         <MeshBackground />
 
         {/* Single screen, vertically centered */}

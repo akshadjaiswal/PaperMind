@@ -118,44 +118,44 @@
 }
 
 .mesh-orb-1 {
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, #6b8f6e 0%, #8c9a84 60%, transparent 100%);
-  top: -15%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, #4a7a50 0%, #6b8f6e 50%, transparent 100%);
+  top: -20%;
   left: -20%;
-  opacity: 0.75;
+  opacity: 0.55;
   animation: meshDrift1 10s ease-in-out infinite;
 }
 
 .mesh-orb-2 {
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, #c4a882 0%, #dccfc2 60%, transparent 100%);
-  top: 25%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #c4956a 0%, #d4a87a 50%, transparent 100%);
+  top: 20%;
   right: -15%;
-  opacity: 0.7;
+  opacity: 0.5;
   animation: meshDrift2 13s ease-in-out infinite;
   animation-delay: -4s;
 }
 
 .mesh-orb-3 {
-  width: 480px;
-  height: 480px;
-  background: radial-gradient(circle, #c27b66 0%, #d4957e 60%, transparent 100%);
-  bottom: -15%;
-  left: 20%;
-  opacity: 0.55;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #b85c44 0%, #c27b66 50%, transparent 100%);
+  bottom: -20%;
+  left: 15%;
+  opacity: 0.45;
   animation: meshDrift3 11s ease-in-out infinite;
   animation-delay: -7s;
 }
 
 .mesh-orb-4 {
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, #7a9e85 0%, #a8c4a2 60%, transparent 100%);
-  top: 45%;
-  left: 35%;
-  opacity: 0.5;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, #3d7a55 0%, #5a9e70 50%, transparent 100%);
+  top: 40%;
+  left: 30%;
+  opacity: 0.4;
   animation: meshDrift4 9s ease-in-out infinite;
   animation-delay: -2s;
 }
@@ -166,26 +166,32 @@
 .dark .mesh-orb-4 { background: radial-gradient(circle, #2a4a30 0%, #1e3524 60%, transparent 100%); opacity: 0.55; }
 
 @keyframes meshDrift1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(80px, 60px) scale(1.12); }
-  66% { transform: translate(-50px, 100px) scale(0.92); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25%  { transform: translate(160px, 120px) scale(1.15) rotate(45deg); }
+  50%  { transform: translate(80px, 220px) scale(0.9) rotate(90deg); }
+  75%  { transform: translate(-100px, 140px) scale(1.1) rotate(135deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(180deg); }
 }
 
 @keyframes meshDrift2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40% { transform: translate(-100px, -70px) scale(1.15); }
-  70% { transform: translate(60px, 80px) scale(0.88); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  30%  { transform: translate(-180px, -120px) scale(1.2) rotate(-60deg); }
+  60%  { transform: translate(-80px, 160px) scale(0.85) rotate(-120deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(-180deg); }
 }
 
 @keyframes meshDrift3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(90px, -80px) scale(1.1); }
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(200px, -150px) scale(1.15); }
+  66%  { transform: translate(-120px, -80px) scale(0.88); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @keyframes meshDrift4 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  30% { transform: translate(-70px, 50px) scale(1.18); }
-  70% { transform: translate(80px, -40px) scale(0.85); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  40%  { transform: translate(-160px, 120px) scale(1.25) rotate(90deg); }
+  70%  { transform: translate(140px, -100px) scale(0.8) rotate(150deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(180deg); }
 }
 
 /* Paper grain texture — mandatory, applied on <body class="grain-overlay"> */
