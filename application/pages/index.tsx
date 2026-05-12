@@ -39,28 +39,27 @@ export default function Home() {
         />
       </Head>
       <LazyMotion features={domAnimation}>
-        <div className="relative flex h-screen w-full items-center justify-center overflow-hidden">
-        <MeshBackground />
+        <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden px-4">
+          <MeshBackground />
 
-        {/* Single screen, vertically centered */}
-        <div className="flex h-full w-full items-center justify-center px-6 py-8">
+          {/* Glass card */}
           <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="max-w-lg w-full text-center space-y-8"
+            initial={{ opacity: 0, y: 32, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="relative max-w-lg w-full rounded-[2rem] bg-white/40 dark:bg-black/25 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-soft-xl px-8 sm:px-10 py-10 text-center space-y-7"
           >
-            {/* Logo mark */}
+            {/* Logo */}
             <m.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center justify-center gap-2.5"
+              className="flex items-center justify-center gap-3"
             >
-              <div className="size-10 rounded-2xl bg-primary/15 flex items-center justify-center backdrop-blur-sm">
+              <div className="size-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
                 <LeafIconLg />
               </div>
-              <span className="font-serif text-2xl font-semibold text-app-text tracking-tight">
+              <span className="font-serif text-3xl font-semibold text-app-text tracking-tight">
                 PaperMind
               </span>
             </m.div>
@@ -71,15 +70,14 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-app-text leading-tight mb-4">
+              <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-app-text leading-[1.15] mb-3">
                 Research Synthesis,
                 <br />
                 <span className="text-primary">Grounded in Real Papers.</span>
               </h1>
-              <p className="font-sans text-base text-app-text/55 leading-relaxed max-w-md mx-auto">
-                Search peer-reviewed papers from PubMed and Semantic Scholar,
-                select the ones that matter, and get a structured AI-synthesized
-                report in seconds.
+              <p className="font-sans text-[15px] text-app-text/55 leading-relaxed max-w-sm mx-auto">
+                Fetch real peer-reviewed papers, select what matters, and get a
+                structured AI report in seconds.
               </p>
             </m.div>
 
@@ -93,30 +91,31 @@ export default function Home() {
               {SOURCE_BADGES.map((b) => (
                 <div
                   key={b.label}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-surface/70 backdrop-blur-sm border border-border text-xs font-sans shadow-soft-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-surface/80 backdrop-blur-sm border border-border/60 text-[11px] font-sans shadow-soft-sm"
                 >
-                  <span className="font-medium text-app-text/80">{b.label}</span>
+                  <span className="size-1.5 rounded-full bg-primary/60 shrink-0" />
+                  <span className="font-semibold text-app-text/75">{b.label}</span>
                   <span className="text-app-text/35">{b.desc}</span>
                 </div>
               ))}
             </m.div>
 
-            {/* Example topic chips */}
+            {/* Topic chips */}
             <m.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="space-y-2"
+              className="space-y-2.5"
             >
-              <p className="text-[11px] font-sans font-medium text-app-text/35 uppercase tracking-wider">
-                Try a topic
+              <p className="text-[11px] font-sans font-medium text-app-text/40 tracking-widest uppercase">
+                Try a topic →
               </p>
               <div className="flex justify-center gap-2 flex-wrap">
                 {TOPIC_CHIPS.map((chip) => (
                   <button
                     key={chip}
                     onClick={() => goToResearch(chip)}
-                    className="px-3 py-1.5 rounded-pill bg-surface/60 backdrop-blur-sm border border-border text-xs font-sans text-app-text/65 hover:text-app-text hover:bg-surface hover:border-primary/40 hover:shadow-soft-sm transition-all duration-200"
+                    className="px-3.5 py-1.5 rounded-pill bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 text-xs font-sans font-medium text-app-text/70 hover:text-app-text transition-all duration-200 hover:shadow-soft-sm"
                   >
                     {chip}
                   </button>
@@ -124,25 +123,32 @@ export default function Home() {
               </div>
             </m.div>
 
-            {/* Primary CTA */}
+            {/* CTA */}
             <m.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
+              className="pt-1"
             >
               <button
                 onClick={() => goToResearch()}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-pill bg-interactive text-white font-sans font-semibold text-sm hover:bg-interactive-hover shadow-soft-md hover:shadow-soft-lg transition-all duration-200 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2.5 px-8 py-4 rounded-pill bg-interactive hover:bg-interactive-hover text-white font-sans font-semibold text-[15px] shadow-soft-lg hover:shadow-soft-xl transition-all duration-200 hover:-translate-y-1 active:translate-y-0"
               >
                 Start Researching
                 <ArrowRight />
               </button>
-              <p className="text-[11px] text-app-text/30 font-sans mt-4">
-                No sign-up · No database · Free to use
-              </p>
             </m.div>
           </m.div>
-        </div>
+
+          {/* Tagline below card */}
+          <m.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="text-[11px] text-app-text/30 font-sans mt-5 text-center"
+          >
+            No sign-up · No database · Free to use
+          </m.p>
         </div>
       </LazyMotion>
     </>
@@ -152,8 +158,8 @@ export default function Home() {
 function LeafIconLg() {
   return (
     <svg
-      width="20"
-      height="20"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       fill="none"
       stroke="#8C9A84"
