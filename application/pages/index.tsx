@@ -39,7 +39,7 @@ export default function Home() {
         />
       </Head>
       <LazyMotion features={domAnimation}>
-        <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden px-4">
+        <div className="relative flex h-dvh w-full flex-col items-center justify-center overflow-hidden px-4">
           <MeshBackground />
 
           {/* Glass card */}

@@ -12,7 +12,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="flex h-screen overflow-hidden bg-bg">
+      <div className="flex h-dvh overflow-hidden bg-bg">
         {/* Desktop sidebar */}
         <div className="hidden md:flex">
           <Sidebar />
