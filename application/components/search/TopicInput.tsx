@@ -95,14 +95,17 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
             </div>
 
             {/* Input */}
+            <label htmlFor="topic-input" className="sr-only">Research topic</label>
             <input
               {...register('topic')}
+              id="topic-input"
               type="text"
               placeholder="Enter a research topic…"
               disabled={isLoading}
               className={cn(
                 'flex-1 bg-transparent outline-none text-app-text font-sans text-[15px]',
                 'placeholder:text-app-text/30 disabled:opacity-60 min-w-0',
+                'focus:outline-none',
               )}
               autoComplete="off"
             />
@@ -116,8 +119,9 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.15 }}
+                  aria-label="Clear search topic"
                   onClick={() => setValue('topic', '')}
-                  className="shrink-0 size-5 rounded-full bg-app-text/10 flex items-center justify-center text-app-text/40 hover:text-app-text/70 hover:bg-app-text/15 transition-colors"
+                  className="shrink-0 size-5 rounded-full bg-app-text/10 flex items-center justify-center text-app-text/40 hover:text-app-text/70 hover:bg-app-text/15 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
                 >
                   <X size={11} />
                 </m.button>
@@ -144,7 +148,7 @@ export function TopicInput({ onSearch, isLoading }: TopicInputProps) {
                 onClick={() => setSourcesOpen((v) => !v)}
                 className={cn(
                   'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[12px] font-medium font-sans',
-                  'transition-all duration-200 border',
+                  'transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1',
                   sourcesOpen
                     ? 'bg-primary/10 text-primary border-primary/25'
                     : 'text-app-text/45 border-transparent hover:bg-surface-raised hover:text-app-text/65 hover:border-border',

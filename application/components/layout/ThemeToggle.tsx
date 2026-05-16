@@ -20,7 +20,7 @@ export function ThemeToggle() {
           aria-label={label}
           title={label}
           className={cn(
-            'flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200',
+            'flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1',
             theme === value
               ? 'bg-primary/20 text-primary shadow-soft-sm'
               : 'text-app-text/35 hover:text-app-text/60 hover:bg-surface'

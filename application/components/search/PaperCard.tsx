@@ -23,7 +23,7 @@ export function PaperCard({ paper, isSelected, onToggle, index }: PaperCardProps
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
       className={cn(
-        'bg-surface rounded-card border transition-all duration-300 p-5 flex gap-4 cursor-pointer',
+        'bg-surface rounded-card border transition-all duration-300 p-5 flex gap-4 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
         isSelected
           ? 'border-primary/50 shadow-soft-md bg-primary/5'
           : 'border-border shadow-soft-sm hover:shadow-soft-md hover:border-primary/30'
